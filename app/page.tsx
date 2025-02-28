@@ -82,7 +82,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!socket) {
-      const newSocket = io("http://localhost:3000")
+      const newSocket = io("https://websocket-chatapp-server.onrender.com")
 
       newSocket.on("message", (messageObject) => {
         setInbox((inbox: any) => [...inbox, messageObject])
