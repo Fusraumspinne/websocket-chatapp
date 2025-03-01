@@ -13,7 +13,6 @@ export default function Home() {
 
   const [messages, setMessages] = useState<any>([]);
 
-  const [message, setMessage] = useState<string>("");
   const [roomName, setRoomName] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
 
@@ -76,17 +75,16 @@ export default function Home() {
   };
 
   const handleSendMessage = (message: string) => {
-    setMessage(message);
     socket.emit("message", {
       userName,
       message,
       roomName,
       timestamp: getDate(),
     });
-    saveMessage();
+    saveMessage(message);
   };
 
-  const saveMessage = async () => {
+  const saveMessage = async (message: string) => {
     const timestamp = getDate();
 
     try {
@@ -102,7 +100,7 @@ export default function Home() {
       });
 
       if (resSaveMessage.ok) {
-        setMessage("");
+        console.log("Nachricht wurde erfolgreich gespeichert");
       } else {
         console.error("Ein Fehler ist beim speichern der Nachricht aufgetreten:", resSaveMessage);
       }
