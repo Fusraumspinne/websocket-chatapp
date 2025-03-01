@@ -5,11 +5,21 @@ import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
 
+//Bearbeiten und Löschen von Nachrichten
+//Reaktionen auf Nachrichten
+//Suchfunktion für Nachrichten
+//Verschlüsselung der Nachrichten
+
 export default function Home() {
   const [socket, setSocket] = useState<any>(undefined);
 
   const [joined, setJoinded] = useState<boolean>(false);
   const [showRooms, setShowRooms] = useState<boolean>(false);
+  const [autoJoin, setAutoJoin] = useState<boolean>(false);
+
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [messages, setMessages] = useState<any>([]);
 
@@ -20,12 +30,13 @@ export default function Home() {
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const chatEndRef = useRef<any>(null);
+  let typingTimeout: NodeJS.Timeout | null = null;
 
   const joinRoomFunction = (room: string) => {
     if (room) {
       setRoomName(room);
-      if (roomName.length && userName.length) {
-        handleJoinRoom();
+      if (room.length && userName.length) {
+        setAutoJoin(true);
       }
     } else {
       if (roomName.length && userName.length) {
@@ -35,6 +46,7 @@ export default function Home() {
   };
 
   const handleJoinRoom = () => {
+    localStorage.setItem("Username", userName);
     setJoinded(true);
     const timestamp = getDate();
     socket.emit("joinRoom", roomName, userName, timestamp);
@@ -52,8 +64,6 @@ export default function Home() {
   };
 
   const getPrevMessages = async () => {
-    setMessages([]);
-
     try {
       const resPrevMessages = await fetch("/api/getMessages", {
         method: "POST",
@@ -65,12 +75,18 @@ export default function Home() {
 
       if (resPrevMessages.ok) {
         const data = await resPrevMessages.json();
-        setMessages(data.messages);
+        setMessages((prevMessages: any) => [...prevMessages, ...data.messages]);
       } else {
-        console.error("Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ", resPrevMessages);
+        console.error(
+          "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
+          resPrevMessages
+        );
       }
     } catch (error) {
-      console.error("Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ", error);
+      console.error(
+        "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
+        error
+      );
     }
   };
 
@@ -81,6 +97,8 @@ export default function Home() {
       roomName,
       timestamp: getDate(),
     });
+    setIsTyping(false);
+    socket.emit("stopTyping", { userName, roomName });
     saveMessage(message);
   };
 
@@ -102,15 +120,22 @@ export default function Home() {
       if (resSaveMessage.ok) {
         console.log("Nachricht wurde erfolgreich gespeichert");
       } else {
-        console.error("Ein Fehler ist beim speichern der Nachricht aufgetreten:", resSaveMessage);
+        console.error(
+          "Ein Fehler ist beim speichern der Nachricht aufgetreten:",
+          resSaveMessage
+        );
       }
     } catch (error) {
-      console.error("Ein Fehler ist beim speichern der Nachricht aufgetreten: ", error);
+      console.error(
+        "Ein Fehler ist beim speichern der Nachricht aufgetreten: ",
+        error
+      );
     }
   };
 
   useEffect(() => {
     if (!socket) {
+      //const newSocket = io("http://localhost:3000");
       const newSocket = io("https://websocket-chatapp-server.onrender.com");
 
       newSocket.on("message", (messageObject) => {
@@ -125,6 +150,10 @@ export default function Home() {
         setRoomsList(rooms);
       });
 
+      newSocket.on("typingUsers", (users) => {
+        setTypingUsers(users);
+      });
+
       setSocket(newSocket);
     } else {
       socket.emit("getRooms");
@@ -134,6 +163,22 @@ export default function Home() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleTyping = () => {
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("typing", { userName, roomName });
+    }
+  
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+  
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("stopTyping", { userName, roomName });
+    }, 2000);
+  };
 
   const getDate = () => {
     const now = new Date();
@@ -161,6 +206,17 @@ export default function Home() {
       joinRoomFunction("");
     }
   };
+
+  useEffect(() => {
+    setUserName(localStorage.getItem("Username") || "");
+  }, []);
+
+  useEffect(() => {
+    if (autoJoin) {
+      handleJoinRoom();
+      setAutoJoin(false);
+    }
+  }, [autoJoin]);
 
   return (
     <div className="flex md:mt-24 mt-12 jusify-center w-full">
@@ -210,7 +266,11 @@ export default function Home() {
               <ul className="border-2 rounded-lg border-gray-300 w-64 p-1">
                 {roomsList && Object.keys(roomsList).length > 0 ? (
                   Object.keys(roomsList).map((room, index) => (
-                    <li key={index} onClick={() => joinRoomFunction(room)}>
+                    <li
+                      key={index}
+                      onClick={() => joinRoomFunction(room)}
+                      className="cursor-pointer"
+                    >
                       <h1 className="text-lg font-semibold underline text-gray-700">
                         Raum: {room}
                       </h1>
@@ -257,13 +317,12 @@ export default function Home() {
               <ul className="ms-4 flex">
                 {currentRoomUsers.slice(0, 4).map((user, index, arr) => (
                   <li key={index} className="md:text-base text-xs">
-                    {user}{index < arr.length - 1 ? "|" : ""}
+                    {user}
+                    {index < arr.length - 1 ? "|" : ""}
                   </li>
                 ))}
                 {currentRoomUsers.length > 4 && (
-                  <li>
-                    und {currentRoomUsers.length - 4} mehr
-                  </li>
+                  <li>und {currentRoomUsers.length - 4} mehr</li>
                 )}
               </ul>
             </div>
@@ -279,11 +338,28 @@ export default function Home() {
                 timestamp={messageObject.timestamp}
               />
             ))}
+
             <div ref={chatEndRef} />
           </div>
 
-          <ChatForm onSendMessage={handleSendMessage}/>
-          <button className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 mt-2" onClick={handleLeaveRoom}>Leave Room</button>
+          <div className="text-sm text-gray-500 italic px-2 absolute mt-[-25px]">
+            {typingUsers.length === 1 && `${typingUsers[0]} is typing...`}
+            {typingUsers.length === 2 &&
+              `${typingUsers[0]} and ${typingUsers[1]} are typing...`}
+            {typingUsers.length > 2 &&
+              `${typingUsers[0]} and ${
+                typingUsers.length - 1
+              } more are typing...`}
+          </div>
+
+          <ChatForm onSendMessage={handleSendMessage} onTyping={handleTyping} />
+
+          <button
+            className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 mt-2"
+            onClick={handleLeaveRoom}
+          >
+            Leave Room
+          </button>
         </div>
       )}
     </div>

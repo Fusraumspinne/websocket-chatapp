@@ -4,8 +4,10 @@ import React, { useState } from "react";
 
 const ChatForm = ({
   onSendMessage,
+  onTyping,
 }: {
   onSendMessage: (message: string) => void;
+  onTyping: () => void;
 }) => {
   const [message, setMessage] = useState("");
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,7 +23,10 @@ const ChatForm = ({
       <input
         type="text"
         placeholder="Type your message"
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => {
+          setMessage(e.target.value);
+          onTyping();
+        }}
         className="flex-1 px-4 border-2 border-gray-300 py-2 rounded-lg focus:outline-none w-full"
         value={message}
       />
