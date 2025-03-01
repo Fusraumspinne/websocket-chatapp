@@ -46,6 +46,7 @@ export default function Home() {
   };
 
   const handleJoinRoom = () => {
+    setShowRooms(false);
     localStorage.setItem("Username", userName);
     setJoinded(true);
     const timestamp = getDate();
