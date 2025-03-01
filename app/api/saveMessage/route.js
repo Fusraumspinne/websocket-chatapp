@@ -8,8 +8,8 @@ export async function POST(req) {
         await connectMongoDB()
         await Message.create({ message, userName, roomName, timestamp })
 
-        return NextResponse.json({ message: "Message saved" }, { status: 201 })
+        return NextResponse.json({ message: "Nachricht wurde gespeichert" }, { status: 201 })
     } catch (error) {
-        return NextResponse.json({ message: "Error while saving message" }, { status: 500 })
+        return NextResponse.json({ message: "Ein Fehler ist beim abrufen der Nachrichten aufgetreten" }, { status: 500 })
     }
 }

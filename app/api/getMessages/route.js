@@ -9,6 +9,6 @@ export async function POST(req) {
         const messages = await Message.find({ roomName })
         return NextResponse.json({ messages })
     } catch (error) {
-        return NextResponse.json({ message: "Error while loading messages" })
+        return NextResponse.json({ message: "Ein Fehler ist beim abrufen der Nachrichten aufgetreten" })
     }
 }

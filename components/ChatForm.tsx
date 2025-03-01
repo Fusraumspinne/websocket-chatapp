@@ -16,14 +16,6 @@ const ChatForm = ({
     }
   };
 
-  const handleKeyKeyPressMessage = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      setMessage("");
-    }
-  };
-
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 md:mt-4 mt-2">
       <input

@@ -7,15 +7,73 @@ import ChatForm from "@/components/ChatForm";
 
 export default function Home() {
   const [socket, setSocket] = useState<any>(undefined);
+
+  const [joined, setJoinded] = useState<boolean>(false);
+  const [showRooms, setShowRooms] = useState<boolean>(false);
+
   const [messages, setMessages] = useState<any>([]);
+
   const [message, setMessage] = useState<string>("");
   const [roomName, setRoomName] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
+
   const [roomsList, setRoomsList] = useState<any>({});
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
+
   const chatEndRef = useRef<any>(null);
-  const [joined, setJoinded] = useState<boolean>(false);
-  const [showRooms, setShowRooms] = useState<boolean>(false);
+
+  const joinRoomFunction = (room: string) => {
+    if (room) {
+      setRoomName(room);
+      if (roomName.length && userName.length) {
+        handleJoinRoom();
+      }
+    } else {
+      if (roomName.length && userName.length) {
+        handleJoinRoom();
+      }
+    }
+  };
+
+  const handleJoinRoom = () => {
+    setJoinded(true);
+    const timestamp = getDate();
+    socket.emit("joinRoom", roomName, userName, timestamp);
+    getPrevMessages();
+  };
+
+  const handleLeaveRoom = () => {
+    const timestamp = getDate();
+    socket.emit("leaveRoom", roomName, userName, timestamp);
+    setJoinded(false);
+    setMessages([]);
+    setRoomName("");
+    setCurrentRoomUsers([]);
+    socket.emit("getRooms");
+  };
+
+  const getPrevMessages = async () => {
+    setMessages([]);
+
+    try {
+      const resPrevMessages = await fetch("/api/getMessages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomName,
+        }),
+      });
+
+      if (resPrevMessages.ok) {
+        const data = await resPrevMessages.json();
+        setMessages(data.messages);
+      } else {
+        console.error("Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ", resPrevMessages);
+      }
+    } catch (error) {
+      console.error("Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ", error);
+    }
+  };
 
   const handleSendMessage = (message: string) => {
     setMessage(message);
@@ -46,41 +104,11 @@ export default function Home() {
       if (resSaveMessage.ok) {
         setMessage("");
       } else {
-        console.error("Error while saving message");
+        console.error("Ein Fehler ist beim speichern der Nachricht aufgetreten:", resSaveMessage);
       }
     } catch (error) {
-      console.error("Error while saving message", error);
+      console.error("Ein Fehler ist beim speichern der Nachricht aufgetreten: ", error);
     }
-  };
-
-  const handleJoinRoom = () => {
-    setJoinded(true);
-    const timestamp = getDate();
-    socket.emit("joinRoom", roomName, userName, timestamp);
-    getPrevMessages();
-  };
-
-  const joinRoomFunction = (room: string) => {
-    if (room) {
-      setRoomName(room);
-      if (roomName.length && userName.length) {
-        handleJoinRoom();
-      }
-    } else {
-      if (roomName.length && userName.length) {
-        handleJoinRoom();
-      }
-    }
-  };
-
-  const handleLeaveRoom = () => {
-    const timestamp = getDate();
-    socket.emit("leaveRoom", roomName, userName, timestamp);
-    setJoinded(false);
-    setMessages([]);
-    setRoomName("");
-    setCurrentRoomUsers([]);
-    socket.emit("getRooms");
   };
 
   useEffect(() => {
@@ -105,19 +133,9 @@ export default function Home() {
     }
   }, [socket]);
 
-  const handleKeyKeyPressMessage = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      handleSendMessage(message);
-    }
-  };
-
-  const handleKeyPressRoom = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      joinRoomFunction("");
-    }
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const getDate = () => {
     const now = new Date();
@@ -134,36 +152,17 @@ export default function Home() {
     return formattedDate;
   };
 
-  const getPrevMessages = async () => {
-    setMessages([]);
-
-    try {
-      const resPrevMessages = await fetch("/api/getMessages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roomName,
-        }),
-      });
-
-      if (resPrevMessages.ok) {
-        const data = await resPrevMessages.json();
-        setMessages(data.messages);
-      } else {
-        console.error("Error while loading messages");
-      }
-    } catch (error) {
-      console.error("Error while loading messages", error);
+  const scrollToBottom = () => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const scrollToBottom = () => {
-    //chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+  const handleKeyPressRoom = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      joinRoomFunction("");
+    }
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   return (
     <div className="flex md:mt-24 mt-12 jusify-center w-full">
@@ -185,7 +184,7 @@ export default function Home() {
               />
               <input
                 placeholder="Enter a room..."
-                onKeyPress={handleKeyPressRoom}
+                onKeyDown={handleKeyPressRoom}
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 type="text"
@@ -282,6 +281,7 @@ export default function Home() {
                 timestamp={messageObject.timestamp}
               />
             ))}
+            <div ref={chatEndRef} />
           </div>
 
           <ChatForm onSendMessage={handleSendMessage}/>
