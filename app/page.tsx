@@ -4,9 +4,10 @@ import { io } from "socket.io-client";
 import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import { set } from "mongoose";
 
-//Bearbeiten von Nachrichten
+//Wenn eine Nachricht bearbeitet wurde dann soll das gekenzeichnet werden
 //Reaktionen auf Nachrichten
 //Suchfunktion für Nachrichten
 //Verschlüsselung der Nachrichten
@@ -29,6 +30,8 @@ export default function Home() {
 
   const [roomsList, setRoomsList] = useState<any>({});
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
+
+  const [editMessageID, setEditMessageID] = useState<string>("");
 
   const chatEndRef = useRef<any>(null);
   const userNameRef = useRef(userName);
@@ -145,7 +148,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: messageId
+          id: messageId,
         }),
       });
 
@@ -153,15 +156,48 @@ export default function Home() {
         console.log("Nachricht wurde erfolgreich gelöscht");
       } else {
         console.error(
-          "Ein Fehler ist beim löschen der Nachricht aufgetreten:",resDeleteMessage
+          "Ein Fehler ist beim löschen der Nachricht aufgetreten:",
+          resDeleteMessage
         );
       }
     } catch (error) {
       console.error(
-        "Ein Fehler ist beim löschen der Nachricht aufgetreten: ", error
+        "Ein Fehler ist beim löschen der Nachricht aufgetreten: ",
+        error
       );
     }
-  }
+  };
+
+  const editMessage = async (messageId: string, message: string) => {
+    socket.emit("editMessage", { message, roomName, id: messageId });
+
+    try {
+      const resEditMessage = await fetch("/api/editMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: messageId,
+          newMessage: message
+        }),
+      });
+
+      if (resEditMessage.ok) {
+        console.log("Nachricht wurde erfolgreich aktualisiert");
+      } else {
+        console.error(
+          "Ein Fehler ist beim aktualisieren der Nachricht aufgetreten:",
+          resEditMessage
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Ein Fehler ist beim aktualisieren der Nachricht aufgetreten: ",
+        error
+      );
+    }
+
+    setEditMessageID("");
+  };
 
   useEffect(() => {
     if (!socket) {
@@ -178,6 +214,16 @@ export default function Home() {
         );
       });
 
+      newSocket.on("editMessage", (messageObject) => {
+        setMessages((prevMessages: any) =>
+          prevMessages.map((msg: any) =>
+            msg.id === messageObject.id
+              ? { ...msg, message: messageObject.message }
+              : msg
+          )
+        );
+      });
+
       newSocket.on("roomUsers", (users) => {
         setCurrentRoomUsers(users);
       });
@@ -187,7 +233,9 @@ export default function Home() {
       });
 
       newSocket.on("typingUsers", (users) => {
-        const filteredUsers = users.filter((user: string) => user !== userNameRef.current);
+        const filteredUsers = users.filter(
+          (user: string) => user !== userNameRef.current
+        );
         setTypingUsers(filteredUsers);
       });
 
@@ -202,15 +250,15 @@ export default function Home() {
   }, [messages]);
 
   const handleTyping = () => {
-    if (!isTyping) {
+    if (!isTyping && editMessageID === "") {
       setIsTyping(true);
       socket.emit("typing", { userName, roomName });
     }
-  
+
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-  
+
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
       socket.emit("stopTyping", { userName, roomName });
@@ -316,23 +364,27 @@ export default function Home() {
                         Raum: {room}
                       </h1>
                       <h2 className="text-base text-gray-600">Users:</h2>
-                        <ul className="flex flex-wrap">
+                      <ul className="flex flex-wrap">
                         {roomsList[room]?.users?.length > 0 ? (
                           roomsList[room].users.map(
-                          (user: string, userIndex: number) => (
-                            <li
-                            className="text-sm text-gray-600 me-1" key={userIndex}>
-                            {user}
-                            {userIndex < roomsList[room]?.users.length - 1 ? "," : ""}
-                            </li>
-                          )
+                            (user: string, userIndex: number) => (
+                              <li
+                                className="text-sm text-gray-600 me-1"
+                                key={userIndex}
+                              >
+                                {user}
+                                {userIndex < roomsList[room]?.users.length - 1
+                                  ? ","
+                                  : ""}
+                              </li>
+                            )
                           )
                         ) : (
                           <li className="text-sm text-gray-500">
-                          No users in this room
+                            No users in this room
                           </li>
                         )}
-                        </ul>
+                      </ul>
                     </li>
                   ))
                 ) : (
@@ -377,7 +429,9 @@ export default function Home() {
                 isOwnMessage={messageObject.userName === userName}
                 timestamp={messageObject.timestamp}
                 onDelete={() => deleteMessage(messageObject.id)}
+                onEdit={() => setEditMessageID(messageObject.id)}
                 userName={userName}
+                isEditing={editMessageID === messageObject.id}
               />
             ))}
 
@@ -394,7 +448,21 @@ export default function Home() {
               } more are typing...`}
           </div>
 
-          <ChatForm onSendMessage={handleSendMessage} onTyping={handleTyping} />
+          {editMessageID === "" ? (
+            <ChatForm
+              onSendMessage={handleSendMessage}
+              onTyping={handleTyping}
+              isEditing={false}
+            />
+          ) : (
+            <ChatForm
+              onSendMessage={(message: string) =>
+                editMessage(editMessageID, message)
+              }
+              onTyping={handleTyping}
+              isEditing={true}
+            />
+          )}
 
           <button
             className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 mt-2"
