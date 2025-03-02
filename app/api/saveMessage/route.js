@@ -4,9 +4,9 @@ import Message from "@/models/message"
 
 export async function POST(req) {
     try {
-        const { message, userName, roomName, timestamp } = await req.json()
+        const { id, message, userName, roomName, timestamp } = await req.json();
         await connectMongoDB()
-        await Message.create({ message, userName, roomName, timestamp })
+        await Message.create({ id, message, userName, roomName, timestamp });
 
         return NextResponse.json({ message: "Nachricht wurde gespeichert" }, { status: 201 })
     } catch (error) {

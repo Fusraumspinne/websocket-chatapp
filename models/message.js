@@ -2,6 +2,10 @@ import mongoose, {Schema, models} from "mongoose"
 
 const messageSchema = new Schema(
     {
+        id: {
+            type: String,
+            required: true
+        },
         message: {
             type: String,
             required: true

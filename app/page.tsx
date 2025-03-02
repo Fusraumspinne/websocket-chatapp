@@ -4,8 +4,9 @@ import { io } from "socket.io-client";
 import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
+import { v4 as uuidv4 } from 'uuid';
 
-//Bearbeiten und Löschen von Nachrichten
+//Bearbeiten von Nachrichten
 //Reaktionen auf Nachrichten
 //Suchfunktion für Nachrichten
 //Verschlüsselung der Nachrichten
@@ -30,9 +31,15 @@ export default function Home() {
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const chatEndRef = useRef<any>(null);
+  const userNameRef = useRef(userName);
   let typingTimeout: NodeJS.Timeout | null = null;
 
   const joinRoomFunction = (room: string) => {
+    if (userName.length > 10) {
+      alert("Username cannot be longer than 10 characters");
+      return;
+    }
+
     if (room) {
       setRoomName(room);
       if (room.length && userName.length) {
@@ -92,32 +99,28 @@ export default function Home() {
   };
 
   const handleSendMessage = (message: string) => {
-    socket.emit("message", {
+    const messageId = uuidv4();
+    const timestamp = getDate();
+    const messageData = {
+      id: messageId,
       userName,
       message,
       roomName,
-      timestamp: getDate(),
-    });
+      timestamp,
+    };
+    socket.emit("message", messageData);
     setIsTyping(false);
     socket.emit("stopTyping", { userName, roomName });
-    saveMessage(message);
+    saveMessage(messageData);
   };
 
-  const saveMessage = async (message: string) => {
-    const timestamp = getDate();
-
+  const saveMessage = async (messageData: any) => {
     try {
       const resSaveMessage = await fetch("/api/saveMessage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          userName,
-          roomName,
-          timestamp,
-        }),
+        body: JSON.stringify(messageData),
       });
-
       if (resSaveMessage.ok) {
         console.log("Nachricht wurde erfolgreich gespeichert");
       } else {
@@ -134,6 +137,32 @@ export default function Home() {
     }
   };
 
+  const deleteMessage = async (messageId: string) => {
+    socket.emit("deleteMessage", { roomName, id: messageId });
+
+    try {
+      const resDeleteMessage = await fetch("/api/deleteMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: messageId
+        }),
+      });
+
+      if (resDeleteMessage.ok) {
+        console.log("Nachricht wurde erfolgreich gelöscht");
+      } else {
+        console.error(
+          "Ein Fehler ist beim löschen der Nachricht aufgetreten:",resDeleteMessage
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Ein Fehler ist beim löschen der Nachricht aufgetreten: ", error
+      );
+    }
+  }
+
   useEffect(() => {
     if (!socket) {
       //const newSocket = io("http://localhost:3000");
@@ -141,6 +170,12 @@ export default function Home() {
 
       newSocket.on("message", (messageObject) => {
         setMessages((prevMessages: any) => [...prevMessages, messageObject]);
+      });
+
+      newSocket.on("deleteMessage", (id: string) => {
+        setMessages((prevMessages: any) =>
+          prevMessages.filter((message: any) => message.id !== id)
+        );
       });
 
       newSocket.on("roomUsers", (users) => {
@@ -152,7 +187,8 @@ export default function Home() {
       });
 
       newSocket.on("typingUsers", (users) => {
-        setTypingUsers(users);
+        const filteredUsers = users.filter((user: string) => user !== userNameRef.current);
+        setTypingUsers(filteredUsers);
       });
 
       setSocket(newSocket);
@@ -219,6 +255,10 @@ export default function Home() {
     }
   }, [autoJoin]);
 
+  useEffect(() => {
+    userNameRef.current = userName;
+  }, [userName]);
+
   return (
     <div className="flex md:mt-24 mt-12 jusify-center w-full">
       {!joined ? (
@@ -276,24 +316,23 @@ export default function Home() {
                         Raum: {room}
                       </h1>
                       <h2 className="text-base text-gray-600">Users:</h2>
-                      <ul>
+                        <ul className="flex flex-wrap">
                         {roomsList[room]?.users?.length > 0 ? (
                           roomsList[room].users.map(
-                            (user: string, userIndex: number) => (
-                              <li
-                                className="text-sm text-gray-600"
-                                key={userIndex}
-                              >
-                                {user}
-                              </li>
-                            )
+                          (user: string, userIndex: number) => (
+                            <li
+                            className="text-sm text-gray-600 me-1" key={userIndex}>
+                            {user}
+                            {userIndex < roomsList[room]?.users.length - 1 ? "," : ""}
+                            </li>
+                          )
                           )
                         ) : (
                           <li className="text-sm text-gray-500">
-                            No users in this room
+                          No users in this room
                           </li>
                         )}
-                      </ul>
+                        </ul>
                     </li>
                   ))
                 ) : (
@@ -337,6 +376,8 @@ export default function Home() {
                 message={messageObject.message}
                 isOwnMessage={messageObject.userName === userName}
                 timestamp={messageObject.timestamp}
+                onDelete={() => deleteMessage(messageObject.id)}
+                userName={userName}
               />
             ))}
 
