@@ -11,6 +11,7 @@ export async function POST(req) {
     const updatedMessage = await Message.findOneAndUpdate(
       { id },
       { message: newMessage },
+      { edited: true}
     );
     
     if (!updatedMessage) {

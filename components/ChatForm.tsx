@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const ChatForm = ({
   onSendMessage,
@@ -12,6 +12,15 @@ const ChatForm = ({
   isEditing: boolean;
 }) => {
   const [message, setMessage] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message.trim() !== "") {
@@ -24,6 +33,7 @@ const ChatForm = ({
     <form onSubmit={handleSubmit} className="flex gap-2 md:mt-4 mt-2">
       {isEditing ? (
         <input
+        ref={inputRef}
         type="text"
         placeholder="Edit your message"
         onChange={(e) => {

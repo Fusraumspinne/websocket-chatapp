@@ -18,6 +18,10 @@ const messageSchema = new Schema(
             type: String,
             required: true
         },
+        edited: {
+            type: Boolean,
+            required: true
+        },
         timestamp: {
             type: String,
             required: true

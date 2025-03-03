@@ -12,9 +12,10 @@ interface ChatMessageProps {
     onEdit?: () => void;
     userName: string;
     isEditing: boolean;
+    edited: boolean;
 }
 
-const ChatMessage = ({sender, message, isOwnMessage, timestamp, onDelete, onEdit, userName, isEditing} : ChatMessageProps) => {
+const ChatMessage = ({sender, message, isOwnMessage, timestamp, onDelete, onEdit, userName, isEditing, edited} : ChatMessageProps) => {
   const isSystemMessage = sender === 'System';
 
   const [quickMenu, setQuickMenu] = useState(false);
@@ -46,7 +47,10 @@ const ChatMessage = ({sender, message, isOwnMessage, timestamp, onDelete, onEdit
         <div onClick={() => toggleQuickMenu()} className={`border-2 rounded-lg border-gray-300 max-w-xs md:px-4 px-2 md:py-2 py-1 ${isSystemMessage ? 'bg-gray-800 text-white text-center md:text-xs text-sm' : isEditing ? 'bg-gray-500 text-white' : isOwnMessage ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
           {!isSystemMessage && <p className="md:text-xl text-base md:font-bold font-semibold">{sender}</p>}
           <p className='md:text-base text-xs md:font-normal font-medium'>{message}</p>
-          <p className='md:text-xs text-xs'>{timestamp}</p>
+          <div className='flex'>
+            <p className='md:text-xs text-xs me-1'>{timestamp}</p>
+            {edited && <p className='md:text-xs text-xs'> | Edited</p>}
+          </div>
           {quickMenu && (
           <div className='flex items-center'>
             <button onClick={(e) => editMessage(e)} className="flex justify-center items-center me-1 w-1/3 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"><EditRoundedIcon style={{ fontSize: '16px' }}/></button>

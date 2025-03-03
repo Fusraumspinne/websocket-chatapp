@@ -7,10 +7,11 @@ import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
 import { set } from "mongoose";
 
-//Wenn eine Nachricht bearbeitet wurde dann soll das gekenzeichnet werden
 //Reaktionen auf Nachrichten
 //Suchfunktion für Nachrichten
 //Verschlüsselung der Nachrichten
+//Slow-Modus 5 Sekunden pro Nachricht
+//Automatische Warnungen oder Timeouts bei Spam oder bösen Wörtern
 
 export default function Home() {
   const [socket, setSocket] = useState<any>(undefined);
@@ -110,6 +111,7 @@ export default function Home() {
       message,
       roomName,
       timestamp,
+      edited: false,
     };
     socket.emit("message", messageData);
     setIsTyping(false);
@@ -177,7 +179,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: messageId,
-          newMessage: message
+          newMessage: message,
         }),
       });
 
@@ -216,10 +218,9 @@ export default function Home() {
 
       newSocket.on("editMessage", (messageObject) => {
         setMessages((prevMessages: any) =>
-          prevMessages.map((msg: any) =>
-            msg.id === messageObject.id
-              ? { ...msg, message: messageObject.message }
-              : msg
+          prevMessages.map(
+            (msg: any) =>
+              msg.id === messageObject.id ? { ...msg, message: messageObject.message, edited: true } : msg,
           )
         );
       });
@@ -432,6 +433,7 @@ export default function Home() {
                 onEdit={() => setEditMessageID(messageObject.id)}
                 userName={userName}
                 isEditing={editMessageID === messageObject.id}
+                edited={messageObject.edited}
               />
             ))}
 
