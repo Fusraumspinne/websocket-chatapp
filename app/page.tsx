@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
-import { set } from "mongoose";
 
 //Reaktionen auf Nachrichten
 //Suchfunktion für Nachrichten
@@ -87,7 +86,13 @@ export default function Home() {
 
       if (resPrevMessages.ok) {
         const data = await resPrevMessages.json();
-        setMessages((prevMessages: any) => [...prevMessages, ...data.messages]);
+        setMessages((prevMessages: any) => {
+          const allMessages = [...prevMessages, ...data.messages];
+          const sortedMessages = allMessages.sort(
+            (a: any, b: any) => parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
+          );
+          return sortedMessages;
+        })
       } else {
         console.error(
           "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
@@ -101,6 +106,13 @@ export default function Home() {
       );
     }
   };
+
+  const parseGermanDate = (dateStr: string) => {
+    const [datePart, timePart] = dateStr.split(", ");
+    const [day, month, year] = datePart.split(".").map(Number);
+    const [hours, minutes, seconds] = timePart.split(":").map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
+  }
 
   const handleSendMessage = (message: string) => {
     const messageId = uuidv4();
