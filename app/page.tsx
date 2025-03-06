@@ -321,7 +321,7 @@ export default function Home() {
   }, [userName]);
 
   return (
-    <div className="flex md:mt-24 mt-12 jusify-center w-full">
+    <div className="flex md:mt-16 mt-12 jusify-center w-full">
       {!joined ? (
         <div className="flex w-full max-w-3xl mx-auto flex-col items-center">
           {!showRooms ? (
