@@ -433,7 +433,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="md:h-[500px] h-[300px] overflow-y-auto p-4 bg-gray-200 border-2 rounded-lg border-gray-300 no-scrollbar">
+          <div className="md:h-[450px] h-[300px] overflow-y-auto p-4 bg-gray-200 border-2 rounded-lg border-gray-300 no-scrollbar">
             {messages.map((messageObject: any, index: number) => (
               <ChatMessage
                 key={index}
