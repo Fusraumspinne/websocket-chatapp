@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
-
+//Wenn eine Nachticht editiert wurde wird es nocht in der Datenbank gespeichert oder so
 //Reaktionen auf Nachrichten
 //Suchfunktion für Nachrichten
 //Verschlüsselung der Nachrichten
