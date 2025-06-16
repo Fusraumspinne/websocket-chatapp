@@ -6,14 +6,19 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
 
-//Reaktionen auf Nachrichten
-//Suchfunktion für Nachrichten
-//Verschlüsselung der Nachrichten
-//Slow-Modus 5 Sekunden pro Nachricht
-//Automatische Warnungen oder Timeouts bei Spam oder bösen Wörtern
+// Reaktionen auf Nachrichten
+
+// Account
+// Bisher genutze Rooms werden gespeichert
+// Private Nachrichten
+
+// Verschlüsselung der Nachrichten
 
 export default function Home() {
   const [socket, setSocket] = useState<any>(undefined);
+
+  const [dbConnected, setDbConnected] = useState<boolean>(false);
+  const [socketConnected, setSocketConnected] = useState<boolean>(false);
 
   const [joined, setJoinded] = useState<boolean>(false);
   const [showRooms, setShowRooms] = useState<boolean>(false);
@@ -89,10 +94,12 @@ export default function Home() {
         setMessages((prevMessages: any) => {
           const allMessages = [...prevMessages, ...data.messages];
           const sortedMessages = allMessages.sort(
-            (a: any, b: any) => parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
+            (a: any, b: any) =>
+              parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
           );
           return sortedMessages;
-        })
+        });
+        setDbConnected(true);
       } else {
         console.error(
           "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
@@ -112,7 +119,7 @@ export default function Home() {
     const [day, month, year] = datePart.split(".").map(Number);
     const [hours, minutes, seconds] = timePart.split(":").map(Number);
     return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
-  }
+  };
 
   const handleSendMessage = (message: string) => {
     const messageId = uuidv4();
@@ -230,19 +237,22 @@ export default function Home() {
 
       newSocket.on("editMessage", (messageObject) => {
         setMessages((prevMessages: any) =>
-          prevMessages.map(
-            (msg: any) =>
-              msg.id === messageObject.id ? { ...msg, message: messageObject.message, edited: true } : msg,
+          prevMessages.map((msg: any) =>
+            msg.id === messageObject.id
+              ? { ...msg, message: messageObject.message, edited: true }
+              : msg
           )
         );
       });
 
       newSocket.on("roomUsers", (users) => {
         setCurrentRoomUsers(users);
+        setSocketConnected(true);
       });
 
       newSocket.on("roomsList", (rooms) => {
         setRoomsList(rooms);
+        setSocketConnected(true);
       });
 
       newSocket.on("typingUsers", (users) => {
@@ -360,7 +370,7 @@ export default function Home() {
                 Show Rooms
               </button>
             </>
-          ) : (
+          ) : socketConnected ? (
             <>
               <h1 className="md:mb-4 mb-2 text-2xl font-bold text-gray-700">
                 Open Rooms
@@ -411,9 +421,16 @@ export default function Home() {
                 Back
               </button>
             </>
+          ) : (
+            <div className="text-center">
+              <h1 className="text-lg font-semibold text-gray-700">
+                Connecting to server...
+              </h1>
+              <p className="text-sm text-gray-500">Please wait</p>
+            </div>
           )}
         </div>
-      ) : (
+      ) : dbConnected && socketConnected ? (
         <div className="md:w-1/2 w-4/5 mx-auto">
           <div>
             <h1 className="md:mb-4 mb-2 md:text-2xl text-lg font-bold text-gray-700">{`Usernanme: ${userName}`}</h1>
@@ -484,6 +501,16 @@ export default function Home() {
           >
             Leave Room
           </button>
+        </div>
+      ) : (
+        <div className="text-center w-full">
+          <h1 className="text-lg font-semibold text-gray-700">
+            Connecting to
+            {!dbConnected && !socketConnected && " database and server..."}
+            {!dbConnected && socketConnected && " database..."}
+            {dbConnected && !socketConnected && " server..."}
+          </h1>
+          <p className="text-sm text-gray-500">Please wait</p>
         </div>
       )}
     </div>
