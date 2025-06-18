@@ -192,8 +192,12 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!socket) {
-      //const newSocket = io("http://localhost:3000");
-      const newSocket = io("https://websocket-chatapp-server.onrender.com");
+      const SERVER_URL =
+        window.location.hostname === "localhost"
+          ? "http://localhost:3000"
+          : "https://websocket-chatapp-server.onrender.com";
+
+      const newSocket = io(SERVER_URL);
 
       newSocket.on("message", (messageObject) => {
         setMessages((prevMessages: any) => [...prevMessages, messageObject]);

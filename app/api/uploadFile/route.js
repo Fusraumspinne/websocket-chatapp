@@ -42,6 +42,7 @@ export async function POST(req) {
   const uploadResult = await parseResponse(uploadRes);
 
   if (!uploadRes.ok) {
+    console.error("Dropbox Share Error:", shareResult);
     return NextResponse.json(
       {
         error:
