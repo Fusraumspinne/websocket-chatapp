@@ -5,13 +5,12 @@ import { useEffect, useState, useRef } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/lib/store";
 
 export default function ChatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const roomParam = params.id;
-  const userParam = searchParams.get("userName") || "";
   const [socket, setSocket] = useState<any>(undefined);
 
   const [dbConnected, setDbConnected] = useState<boolean>(false);
@@ -24,7 +23,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [messages, setMessages] = useState<any>([]);
 
   const [roomName, setRoomName] = useState<string>(roomParam);
-  const [userName, setUserName] = useState<string>(userParam);
+  const userName = useUserStore((state) => state.userName);
 
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
@@ -35,7 +34,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   let typingTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
-    if (socket) {
+    if (userName === "") {
+      router.push("/");
+    }
+  }, [userName, router]);
+
+  useEffect(() => {
+    if (socket && userName != "") {
       const timestamp = getDate();
       socket.emit("joinRoom", roomName, userName, timestamp);
       getPrevMessages();
@@ -43,37 +48,39 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   }, [socket]);
 
   const getPrevMessages = async () => {
-    try {
-      const resPrevMessages = await fetch("/api/getMessages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roomName,
-        }),
-      });
-
-      if (resPrevMessages.ok) {
-        setDbConnected(true);
-        const data = await resPrevMessages.json();
-        setMessages((prevMessages: any) => {
-          const allMessages = [...prevMessages, ...data.messages];
-          const sortedMessages = allMessages.sort(
-            (a: any, b: any) =>
-              parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
-          );
-          return sortedMessages;
+    if (userName != "") {
+      try {
+        const resPrevMessages = await fetch("/api/getMessages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            roomName,
+          }),
         });
-      } else {
+
+        if (resPrevMessages.ok) {
+          setDbConnected(true);
+          const data = await resPrevMessages.json();
+          setMessages((prevMessages: any) => {
+            const allMessages = [...prevMessages, ...data.messages];
+            const sortedMessages = allMessages.sort(
+              (a: any, b: any) =>
+                parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
+            );
+            return sortedMessages;
+          });
+        } else {
+          console.error(
+            "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
+            resPrevMessages
+          );
+        }
+      } catch (error) {
         console.error(
           "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
-          resPrevMessages
+          error
         );
       }
-    } catch (error) {
-      console.error(
-        "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
-        error
-      );
     }
   };
 
@@ -277,7 +284,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex md:mt-16 mt-12 jusify-center w-full">
-      {socketConnected && dbConnected ? (
+      {socketConnected && dbConnected && userName != "" ? (
         <div className="md:w-1/2 w-4/5 mx-auto">
           <div>
             <h1 className="md:mb-4 mb-2 md:text-2xl text-lg font-bold text-gray-700">{`Usernanme: ${userName}`}</h1>

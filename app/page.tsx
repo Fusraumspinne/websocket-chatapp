@@ -3,6 +3,7 @@
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/lib/store";
 
 // Reaktionen auf Nachrichten
 
@@ -23,7 +24,9 @@ export default function Home() {
   const [autoJoin, setAutoJoin] = useState<boolean>(false);
 
   const [roomName, setRoomName] = useState<string>("");
-  const [userName, setUserName] = useState<string>("");
+
+  const userName = useUserStore((state) => state.userName);
+  const setUserName = useUserStore((state) => state.setUserName);
 
   const [roomsList, setRoomsList] = useState<any>({});
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
@@ -50,7 +53,7 @@ export default function Home() {
     setShowRooms(false);
     localStorage.setItem("Username", userName);
     setJoined(true);
-    router.push(`/chat/${encodeURIComponent(roomName)}?userName=${encodeURIComponent(userName)}`);
+    router.push(`/chat/${encodeURIComponent(roomName)}`);
   };
 
   useEffect(() => {

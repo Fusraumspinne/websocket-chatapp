@@ -57,12 +57,14 @@ const ChatMessage = ({ sender, message, isOwnMessage, timestamp, onDelete, onEdi
             <div className="mb-2">
               <Image src={imageUrl} alt="Image" width={1080} height={1080} className='border-2 rounded-lg border-gray-300 max-w-40 max-h-40 md:max-w-56 md:max-h-56' />
             </div>
-          )}          
+          )}     
+               
           <p className='md:text-base text-xs md:font-normal font-medium'>{messageWithoutImage}</p>
           <div className='flex'>
             <p className='md:text-xs text-xs me-1'>{timestamp}</p>
             {edited && <p className='md:text-xs text-xs'> | Edited</p>}
           </div>
+
           {quickMenu && (
             <div className='flex items-center'>
               <button onClick={(e) => editMessage(e)} className="flex justify-center items-center me-1 w-1/3 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"><EditRoundedIcon style={{ fontSize: '16px' }} /></button>
