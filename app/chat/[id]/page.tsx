@@ -53,6 +53,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       });
 
       if (resPrevMessages.ok) {
+        setDbConnected(true);
         const data = await resPrevMessages.json();
         setMessages((prevMessages: any) => {
           const allMessages = [...prevMessages, ...data.messages];
@@ -62,7 +63,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           );
           return sortedMessages;
         });
-        setDbConnected(true);
       } else {
         console.error(
           "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
@@ -185,8 +185,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!socket) {
-      //const newSocket = io("http://localhost:3000");
-      const newSocket = io("https://websocket-chatapp-server.onrender.com");
+      const newSocket = io("http://localhost:3000");
+      //const newSocket = io("https://websocket-chatapp-server.onrender.com");
 
       newSocket.on("message", (messageObject) => {
         setMessages((prevMessages: any) => [...prevMessages, messageObject]);
@@ -343,7 +343,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           )}
 
           <button
-            className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 mt-2"
+            className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 my-2"
             onClick={handleLeaveRoom}
           >
             Leave Room
