@@ -55,7 +55,7 @@ const ChatMessage = ({ sender, message, isOwnMessage, timestamp, onDelete, onEdi
           {!isSystemMessage && <p className="md:text-xl text-base md:font-bold font-semibold">{sender}</p>}
           {imageUrl && (
             <div className="mb-2">
-              <Image src={imageUrl} alt="Image" width={1080} height={1080} className='border-2 rounded-lg border-gray-300 max-w-56 max-h-56' />
+              <Image src={imageUrl} alt="Image" width={1080} height={1080} className='border-2 rounded-lg border-gray-300 max-w-40 max-h-40 md:max-w-56 md:max-h-56' />
             </div>
           )}          
           <p className='md:text-base text-xs md:font-normal font-medium'>{messageWithoutImage}</p>
