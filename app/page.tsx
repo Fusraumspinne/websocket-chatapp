@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 // Reaktionen auf Nachrichten
 

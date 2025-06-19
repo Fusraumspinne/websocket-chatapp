@@ -5,7 +5,9 @@ import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import DownloadDoneOutlinedIcon from '@mui/icons-material/DownloadDoneOutlined';
+import DownloadDoneOutlinedIcon from "@mui/icons-material/DownloadDoneOutlined";
+import SendIcon from "@mui/icons-material/Send";
+import SyncIcon from "@mui/icons-material/Sync";
 
 const ChatForm = ({
   onSendMessage,
@@ -18,6 +20,7 @@ const ChatForm = ({
 }) => {
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputFileRef = useRef<HTMLInputElement>(null);
@@ -34,6 +37,7 @@ const ChatForm = ({
     let imageUrl = null;
 
     if (file) {
+      setIsUploading(true);
       const formData = new FormData();
       formData.append("file", file);
 
@@ -48,6 +52,7 @@ const ChatForm = ({
       }
 
       setFile(null);
+      setIsUploading(false);
     }
 
     if (imageUrl && message.trim() === "") {
@@ -71,23 +76,22 @@ const ChatForm = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-2 md:mt-4 mt-2 relative"
-    >
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setShowEmojiPicker((f) => !f)}
-          className="px-4 py-2 rounded-lg text-white bg-blue-500  hidden md:block"
-        >
-          <SentimentSatisfiedAltIcon />
-          <span className="sr-only">Emoji Picker</span>
-        </button>
+    <form onSubmit={handleSubmit} className="flex flex-col mt-1 relative">
+      <div className="flex gap-1">
+        <div className="hidden md:block">
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker((f) => !f)}
+            className="px-2 py-2 rounded-lg text-white bg-blue-500 flex justify-center items-center"
+          >
+            <SentimentSatisfiedAltIcon />
+            <span className="sr-only">Emoji Picker</span>
+          </button>
+        </div>
 
         <button
           type="button"
-          className="px-4 py-2 rounded-lg text-white bg-blue-500"
+          className="px-1 py-1 md:px-2 md:py-2 rounded-lg text-white bg-blue-500 flex justify-center items-center"
           onClick={() => inputFileRef.current?.click()}
         >
           {file ? <DownloadDoneOutlinedIcon /> : <FileUploadOutlinedIcon />}
@@ -110,15 +114,16 @@ const ChatForm = ({
             setMessage(e.target.value);
             onTyping();
           }}
-          className="flex-1 px-4 border-2 border-gray-300 py-2 rounded-lg focus:outline-none w-full"
+          className="flex-1 px-2 border-2 border-gray-300 rounded-lg focus:outline-none w-full"
           value={message}
         />
 
         <button
           type="submit"
-          className="px-4 py-2 rounded-lg text-white bg-blue-500"
+          className="px-1 py-1 md:px-2 md:py-2 rounded-lg text-white bg-blue-500 flex justify-center items-center"
+          disabled={isUploading}
         >
-          Send
+          {isUploading ? <SyncIcon className="animate-spin" /> : <SendIcon />}
         </button>
       </div>
 

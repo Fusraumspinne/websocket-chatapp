@@ -7,6 +7,7 @@ import ChatForm from "@/components/ChatForm";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 export default function ChatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -287,24 +288,34 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="flex md:mt-16 mt-12 jusify-center w-full">
+    <div className="flex mt-10 jusify-center w-full">
       {socketConnected && dbConnected && userName != "" ? (
         <div className="md:w-1/2 w-4/5 mx-auto">
-          <div>
-            <h1 className="md:mb-4 mb-2 md:text-2xl text-lg font-bold text-gray-700">{`Usernanme: ${userName}`}</h1>
-            <div className="flex items-baseline">
-              <h1 className="md:mb-4 mb-2 md:text-2xl text-lg font-bold text-gray-700">{`Room: ${roomName}`}</h1>
-              <ul className="ms-4 flex">
-                {currentRoomUsers.slice(0, 4).map((user, index, arr) => (
-                  <li key={index} className="md:text-base text-xs">
-                    {user}
-                    {index < arr.length - 1 ? "|" : ""}
-                  </li>
-                ))}
-                {currentRoomUsers.length > 4 && (
-                  <li>und {currentRoomUsers.length - 4} mehr</li>
-                )}
-              </ul>
+          <div className="flex justify-between items-end mb-1">
+            <div>
+              <h1 className="md:text-lg text-base font-bold text-gray-700">{`${userName}`}</h1>
+              <div className="flex items-baseline">
+                <h1 className="md:text-lg text-base font-bold text-gray-700">{`${roomName}`}</h1>
+                <ul className="ms-2 flex">
+                  {currentRoomUsers.slice(0, 4).map((user, index, arr) => (
+                    <li key={index} className="md:text-base text-xs">
+                      {user}
+                      {index < arr.length - 1 ? "|" : ""}
+                    </li>
+                  ))}
+                  {currentRoomUsers.length > 4 && (
+                    <li>und {currentRoomUsers.length - 4} mehr</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+            <div>
+              <button
+                className="px-1 py-1 md:px-2 md:py-2 text-white bg-red-500 rounded-lg flex justify-center items-center"
+                onClick={handleLeaveRoom}
+              >
+                <ExitToAppIcon />
+              </button>
             </div>
           </div>
 
@@ -352,13 +363,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               isEditing={true}
             />
           )}
-
-          <button
-            className="w-full px-4 py-2 text-white bg-red-500 rounded-lg md:mt-4 my-2"
-            onClick={handleLeaveRoom}
-          >
-            Leave Room
-          </button>
         </div>
       ) : (
         <div className="text-center w-full">
