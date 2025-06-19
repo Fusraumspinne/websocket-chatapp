@@ -7,11 +7,19 @@ import { useUserStore } from "@/lib/store";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 // Reaktionen auf Nachrichten
+// Beim bearbeiten bleibt das Bild erghalten
+// Design überarbietn wie das OG-FLopperChat
+// Nachrichten Zitate
 
 // Account
 // Bisher genutze Rooms werden gespeichert
 // Private Nachrichten
 
+// DevDashboard
+// -> alle nachrichten/nutzer/räume sehen kann
+// -> alles bearbeiten und löschen
+// -> sytstem nachrichten die in allen rooms angezeigt werden
+// -> Nach nutzern und räumen filtern
 // Verschlüsselung der Nachrichten
 
 export default function Home() {
@@ -20,7 +28,6 @@ export default function Home() {
 
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
 
-  const [joined, setJoined] = useState<boolean>(false);
   const [showRooms, setShowRooms] = useState<boolean>(false);
   const [autoJoin, setAutoJoin] = useState<boolean>(false);
 
@@ -30,7 +37,6 @@ export default function Home() {
   const setUserName = useUserStore((state) => state.setUserName);
 
   const [roomsList, setRoomsList] = useState<any>({});
-  const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const joinRoomFunction = (room: string) => {
     if (userName.length > 10) {
@@ -53,7 +59,6 @@ export default function Home() {
   const handleJoinRoom = () => {
     setShowRooms(false);
     localStorage.setItem("Username", userName);
-    setJoined(true);
     router.push(`/chat/${encodeURIComponent(roomName)}`);
   };
 
@@ -95,7 +100,7 @@ export default function Home() {
   }, [autoJoin]);
 
   return (
-    <div className="flex md:mt-16 mt-12 jusify-center w-full">
+    <div className="flex mt-10 jusify-center w-full">
       <div className="flex w-full max-w-3xl mx-auto flex-col items-center">
         {!showRooms ? (
           <>

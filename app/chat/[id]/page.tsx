@@ -29,6 +29,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const [editMessageID, setEditMessageID] = useState<string>("");
+  const [responseToMessage, setResponseToMessage] = useState<any | null>(null);
 
   const chatEndRef = useRef<any>(null);
   const userNameRef = useRef(userName);
@@ -95,6 +96,14 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const handleSendMessage = (message: string) => {
     const messageId = uuidv4();
     const timestamp = getDate();
+    let response = "";
+    if (responseToMessage) {
+      response = [
+        responseToMessage.id,
+        responseToMessage.userName,
+        responseToMessage.message,
+      ].join(", ");
+    }
     const messageData = {
       id: messageId,
       userName,
@@ -102,11 +111,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       roomName,
       timestamp,
       edited: false,
+      response,
     };
     socket.emit("message", messageData);
     setIsTyping(false);
     socket.emit("stopTyping", { userName, roomName });
     saveMessage(messageData);
+    setResponseToMessage(null);
   };
 
   const saveMessage = async (messageData: any) => {
@@ -329,9 +340,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
                 timestamp={messageObject.timestamp}
                 onDelete={() => deleteMessage(messageObject.id)}
                 onEdit={() => setEditMessageID(messageObject.id)}
+                onRespond={() => setResponseToMessage(messageObject)}
                 userName={userName}
                 isEditing={editMessageID === messageObject.id}
                 edited={messageObject.edited}
+                response={messageObject.response}
               />
             ))}
 
@@ -353,6 +366,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               onSendMessage={handleSendMessage}
               onTyping={handleTyping}
               isEditing={false}
+              responseToMessage={responseToMessage}
+              onCancelResponse={() => setResponseToMessage(null)}
             />
           ) : (
             <ChatForm
@@ -361,6 +376,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               }
               onTyping={handleTyping}
               isEditing={true}
+              responseToMessage={responseToMessage}
+              onCancelResponse={() => setResponseToMessage(null)}
             />
           )}
         </div>

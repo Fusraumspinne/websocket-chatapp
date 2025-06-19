@@ -13,10 +13,14 @@ const ChatForm = ({
   onSendMessage,
   onTyping,
   isEditing,
+  responseToMessage,
+  onCancelResponse,
 }: {
   onSendMessage: (message: string) => void;
   onTyping: () => void;
   isEditing: boolean;
+  responseToMessage?: any | null;
+  onCancelResponse?: () => void;
 }) => {
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -109,7 +113,13 @@ const ChatForm = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder={isEditing ? "Edit your message" : "Type your message"}
+          placeholder={
+            isEditing
+              ? "Edit your message"
+              : responseToMessage
+              ? "Answer that message"
+              : "Type your message"
+          }
           onChange={(e) => {
             setMessage(e.target.value);
             onTyping();

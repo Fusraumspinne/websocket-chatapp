@@ -22,6 +22,10 @@ const messageSchema = new Schema(
             type: Boolean,
             required: true
         },
+        response: {
+            type: String,
+            required: true
+        },
         timestamp: {
             type: String,
             required: true
