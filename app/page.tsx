@@ -4,10 +4,11 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
-import LogoutIcon from "@mui/icons-material/Logout";
+import { v4 as uuidv4 } from "uuid";
 
 // Reaktionen auf Nachrichten
 // Beim löschen wird auch das bild aus dropbox gelöscht
+// Special word event mit location
 
 // Account
 // Bisher genutze Rooms werden gespeichert
@@ -97,9 +98,30 @@ export default function Home() {
     }
   }, [autoJoin]);
 
+  const testFunction = (systemMessage: string) => {
+    const now = new Date();
+    const formattedDate = now.toLocaleString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+
+    const messageData = {
+      id: uuidv4(),
+      message: systemMessage,
+      userName: "System",
+      timestamp: formattedDate,
+    };
+    socket.emit("adminMessage", messageData);
+  }
+
   return (
     <div className="flex justify-center">
-      <div className="flex mt-14 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+      <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
         <div className="flex mx-auto flex-col items-center">
           {!showRooms ? (
             <>

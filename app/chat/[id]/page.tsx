@@ -314,7 +314,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex justify-center">
-      <div className="flex md:w-1/2 w-11/12 mt-14 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
+      <div className="flex md:w-1/2 w-11/12 mt-10 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
         {socketConnected && dbConnected && userName != "" ? (
           <div className="w-full">
             <div className="flex justify-between items-end mb-3">
@@ -353,7 +353,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <div className="md:h-[450px] h-[300px] overflow-y-auto p-2 ext-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
+            <div className="md:h-[500px] h-[350px] overflow-y-auto p-2 ext-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
               {messages.map((messageObject: any, index: number) => (
                 <ChatMessage
                   key={index}
