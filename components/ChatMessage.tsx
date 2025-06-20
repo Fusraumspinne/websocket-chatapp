@@ -110,9 +110,9 @@ const ChatMessage = ({
         } md:mb-3 mb-1`}
       >
         <div>
-          {response !== "" && (
+          {(getResponseId() || getResponseUsername() || getResponseMessage()) && (
             <div
-              className="border-2 custom-border custom-blur rounded-bl-none rounded-br-none rounded-tl-lg border-b-0 rounded-tr-lg p-1"
+              className="border-2 custom-border custom-blur rounded-bl-none rounded-br-none rounded-tl-2xl border-b-0 rounded-tr-2xl md:p-3 p-2"
               onClick={() => {
                 const el = document.getElementById(
                   `message-${getResponseId()}`
@@ -134,7 +134,7 @@ const ChatMessage = ({
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border custom-border max-w-8 max-h-8 md:max-w-14 md:max-h-14"
+                  className="border custom-border rounded-lg max-w-8 max-h-8 md:max-w-14 md:max-h-14"
                 />
               )}
               <p className="text-xs md:font-medium font-light text-white">
@@ -149,8 +149,8 @@ const ChatMessage = ({
             id={`message-${id}`}
             onClick={() => toggleQuickMenu()}
             className={`text-white border-2 custom-border custom-blur ${
-              response !== ""
-                ? "rounded-tl-none rounded-tr-none rounded-bl-lg rounded-br-lg"
+              (getResponseId() || getResponseUsername() || getResponseMessage())
+                ? "rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl"
                 : "rounded-lg"
             } ${
               isOwnMessage
@@ -158,7 +158,7 @@ const ChatMessage = ({
                 : isSystemMessage
                 ? "rounded-lg"
                 : "rounded-bl-none"
-            } max-w-xs md:px-4 px-2 md:py-2 py-1 ${
+            } max-w-xs md:px-3 px-2 md:py-2 py-1 ${
               isSystemMessage ? "text-center md:text-xs text-sm" : ""
             }`}
           >
@@ -175,7 +175,7 @@ const ChatMessage = ({
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border-2 custom-border max-w-40 max-h-40 md:max-w-56 md:max-h-56"
+                  className="border-2 custom-border rounded-2xl max-w-40 max-h-40 md:max-w-56 md:max-h-56"
                 />
               </div>
             )}

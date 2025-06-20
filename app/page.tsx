@@ -7,7 +7,6 @@ import { useUserStore } from "@/lib/store";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 // Reaktionen auf Nachrichten
-// Design überarbietn wie das OG-FLopperChat
 // Beim löschen wird auch das bild aus dropbox gelöscht
 
 // Account
@@ -100,7 +99,7 @@ export default function Home() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+      <div className="flex mt-14 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
         <div className="flex mx-auto flex-col items-center">
           {!showRooms ? (
             <>
@@ -189,20 +188,20 @@ export default function Home() {
                   Popular Rooms
                 </h1>
                 <div
-                  onClick={() => joinRoomFunction("GoofyPictures")}
-                  className="cursor-pointer"
-                >
-                  <h1 className="text-base font-semibold underline  text-white">
-                    GoofyPictures
-                  </h1>
-                </div>
-
-                <div
                   onClick={() => joinRoomFunction("MainChannel")}
                   className="cursor-pointer"
                 >
                   <h1 className="text-base font-semibold underline  text-white">
                     MainChannel
+                  </h1>
+                </div>
+                
+                <div
+                  onClick={() => joinRoomFunction("GoofyPictures")}
+                  className="cursor-pointer"
+                >
+                  <h1 className="text-base font-semibold underline  text-white">
+                    GoofyPictures
                   </h1>
                 </div>
               </div>

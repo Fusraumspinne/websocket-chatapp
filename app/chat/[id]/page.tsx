@@ -29,7 +29,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const [editMessageID, setEditMessageID] = useState<string>("");
-  const [responseToMessage, setResponseToMessage] = useState<any | null>(null);
+  const [responseToMessage, setResponseToMessage] = useState<any | null>({id: "", userName: "", message: "",});
 
   const [editBaseText, setEditBaseText] = useState<string>("");
   const [editImageUrl, setEditImageUrl] = useState<string>("");
@@ -313,8 +313,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="flex mt-10 justify-center">
-      <div className="flex md:w-1/2 w-11/12 mt-10 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
+    <div className="flex justify-center">
+      <div className="flex md:w-1/2 w-11/12 mt-14 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
         {socketConnected && dbConnected && userName != "" ? (
           <div className="w-full">
             <div className="flex justify-between items-end mb-3">

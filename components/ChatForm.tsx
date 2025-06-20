@@ -8,6 +8,7 @@ import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import DownloadDoneOutlinedIcon from "@mui/icons-material/DownloadDoneOutlined";
 import SendIcon from "@mui/icons-material/Send";
 import SyncIcon from "@mui/icons-material/Sync";
+import { v4 as uuidv4 } from "uuid";
 
 const ChatForm = ({
   onSendMessage,
@@ -47,7 +48,12 @@ const ChatForm = ({
     if (file) {
       setIsUploading(true);
       const formData = new FormData();
-      formData.append("file", file);
+
+      const ext = file.name.split(".").pop();
+      const newFileName = `${uuidv4()}.${ext}`;
+      const renamedFile = new File([file], newFileName, { type: file.type });
+
+      formData.append("file", renamedFile);
 
       const res = await fetch("/api/uploadFile", {
         method: "POST",

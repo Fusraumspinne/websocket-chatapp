@@ -2,21 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body{
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+html{
     overscroll-behavior: none;
 }
 
 body {
-    min-height: 100vh;
-    min-width: 100vw;
+    min-height: 100dvh;
+    min-width: 100dvw;
     background-image: url('/Images/background-1.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {
