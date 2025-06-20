@@ -134,7 +134,7 @@ const ChatMessage = ({
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border custom-border rounded-lg max-w-8 max-h-8 md:max-w-14 md:max-h-14"
+                  className="border custom-border rounded-lg max-w-8 max-h-auto md:max-w-14"
                 />
               )}
               <p className="text-xs md:font-medium font-light text-white">
@@ -175,7 +175,7 @@ const ChatMessage = ({
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border-2 custom-border rounded-2xl max-w-40 max-h-40 md:max-w-56 md:max-h-56"
+                   className="border-2 custom-border rounded-2xl max-w-40 max-h-auto md:max-w-56"
                 />
               </div>
             )}
