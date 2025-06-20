@@ -31,6 +31,9 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [editMessageID, setEditMessageID] = useState<string>("");
   const [responseToMessage, setResponseToMessage] = useState<any | null>(null);
 
+  const [editBaseText, setEditBaseText] = useState<string>("");
+  const [editImageUrl, setEditImageUrl] = useState<string>("");
+
   const chatEndRef = useRef<any>(null);
   const userNameRef = useRef(userName);
   let typingTimeout: NodeJS.Timeout | null = null;
@@ -298,6 +301,17 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     router.push("/");
   };
 
+  function extractImageUrl(message: string): string {
+    const imageRegex = /(https:\/\/dl\.dropboxusercontent\.com[^\s]+)/;
+    const match = message.match(imageRegex);
+    return match ? match[0] : "";
+  }
+
+  function removeImageUrlFromMessage(message: string): string {
+    const imageRegex = /(https:\/\/dl\.dropboxusercontent\.com[^\s]+)/;
+    return message.replace(imageRegex, "").trim();
+  }
+
   return (
     <div className="flex mt-10 jusify-center w-full">
       {socketConnected && dbConnected && userName != "" ? (
@@ -334,12 +348,20 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             {messages.map((messageObject: any, index: number) => (
               <ChatMessage
                 key={index}
+                id={messageObject.id}
                 sender={messageObject.userName}
                 message={messageObject.message}
                 isOwnMessage={messageObject.userName === userName}
                 timestamp={messageObject.timestamp}
                 onDelete={() => deleteMessage(messageObject.id)}
-                onEdit={() => setEditMessageID(messageObject.id)}
+                onEdit={() => {
+                  setEditMessageID(messageObject.id);
+                  const imageUrl = extractImageUrl(messageObject.message);
+                  setEditImageUrl(imageUrl);
+                  setEditBaseText(
+                    removeImageUrlFromMessage(messageObject.message)
+                  );
+                }}
                 onRespond={() => setResponseToMessage(messageObject)}
                 userName={userName}
                 isEditing={editMessageID === messageObject.id}
@@ -378,6 +400,8 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               isEditing={true}
               responseToMessage={responseToMessage}
               onCancelResponse={() => setResponseToMessage(null)}
+              initialText={editBaseText}
+              initialImageUrl={editImageUrl}
             />
           )}
         </div>

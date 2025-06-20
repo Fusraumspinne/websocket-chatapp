@@ -7,9 +7,8 @@ import { useUserStore } from "@/lib/store";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 // Reaktionen auf Nachrichten
-// Beim bearbeiten bleibt das Bild erghalten
 // Design überarbietn wie das OG-FLopperChat
-// Nachrichten Zitate
+// Beim löschen wird auch das bild aus dropbox gelöscht
 
 // Account
 // Bisher genutze Rooms werden gespeichert

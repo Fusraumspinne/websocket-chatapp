@@ -3,9 +3,10 @@ import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Image from "next/image";
-import RateReviewIcon from '@mui/icons-material/RateReview';
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
 interface ChatMessageProps {
+  id: string;
   sender: string;
   message: string;
   isOwnMessage: boolean;
@@ -20,6 +21,7 @@ interface ChatMessageProps {
 }
 
 const ChatMessage = ({
+  id = "",
   sender = "",
   message = "",
   isOwnMessage = false,
@@ -38,11 +40,11 @@ const ChatMessage = ({
   const [responseMenu, setResponseMenu] = useState(false);
 
   const toggleQuickMenu = () => {
-     if (userName !== sender){
+    if (userName !== sender) {
       setResponseMenu(!responseMenu);
-    } else{
+    } else {
       setQuickMenu(!quickMenu);
-    };
+    }
   };
 
   const deleteMessage = (e: any) => {
@@ -107,7 +109,22 @@ const ChatMessage = ({
       >
         <div>
           {response !== "" && (
-            <div className="border-2  rounded-bl-none rounded-br-none rounded-tl-lg rounded-tr-lg border-gray-300 p-2 bg-gray-300">
+            <div
+              className="border-2 rounded-bl-none rounded-br-none rounded-tl-lg rounded-tr-lg border-gray-300 p-2 bg-gray-300"
+              onClick={() => {
+                const el = document.getElementById(
+                  `message-${getResponseId()}`
+                );
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  el.classList.add("ring-2", "ring-blue-400", "rounded-lg");
+                  setTimeout(
+                    () => el.classList.remove("ring-2", "ring-blue-400"),
+                    2000
+                  );
+                }
+              }}
+            >
               <p className="text-xs md:font-medium font-light">{`-->${getResponseUsername()}`}</p>
               {extractImageUrl(response) && (
                 <Image
@@ -127,6 +144,7 @@ const ChatMessage = ({
           )}
 
           <div
+            id={`message-${id}`}
             onClick={() => toggleQuickMenu()}
             className={`border-2 ${
               response !== ""

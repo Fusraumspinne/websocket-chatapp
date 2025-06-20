@@ -15,14 +15,18 @@ const ChatForm = ({
   isEditing,
   responseToMessage,
   onCancelResponse,
+  initialText,
+  initialImageUrl,
 }: {
   onSendMessage: (message: string) => void;
   onTyping: () => void;
   isEditing: boolean;
   responseToMessage?: any | null;
   onCancelResponse?: () => void;
+  initialText?: string;
+  initialImageUrl?: string;
 }) => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialText || "");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -59,21 +63,27 @@ const ChatForm = ({
       setIsUploading(false);
     }
 
-    if (imageUrl && message.trim() === "") {
-      onSendMessage(imageUrl);
+    if (isEditing) {
+      const finalImageUrl = imageUrl || initialImageUrl;
+      const combined =
+        message.trim() + (finalImageUrl ? `\n${finalImageUrl}` : "");
+      onSendMessage(combined);
       setMessage("");
       return;
     }
 
     if (message.trim() !== "") {
-      if (imageUrl) {
-        onSendMessage(`${message}\n${imageUrl}`);
-      } else {
-        onSendMessage(message);
-      }
+      const combined = message.trim() + (imageUrl ? `\n${imageUrl}` : "");
+      onSendMessage(combined);
       setMessage("");
     }
   };
+
+  useEffect(() => {
+    if (isEditing) {
+      setMessage(initialText || "");
+    }
+  }, [initialText, isEditing]);
 
   const addEmoji = (emoji: any) => {
     setMessage((prev) => prev + emoji.native);
