@@ -313,109 +313,119 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="flex mt-10 jusify-center w-full">
-      {socketConnected && dbConnected && userName != "" ? (
-        <div className="md:w-1/2 w-4/5 mx-auto">
-          <div className="flex justify-between items-end mb-1">
-            <div>
-              <h1 className="md:text-lg text-base font-bold text-gray-700">{`${userName}`}</h1>
-              <div className="flex items-baseline">
-                <h1 className="md:text-lg text-base font-bold text-gray-700">{`${roomName}`}</h1>
-                <ul className="ms-2 flex">
-                  {currentRoomUsers.slice(0, 4).map((user, index, arr) => (
-                    <li key={index} className="md:text-base text-xs">
-                      {user}
-                      {index < arr.length - 1 ? "|" : ""}
-                    </li>
-                  ))}
-                  {currentRoomUsers.length > 4 && (
-                    <li>und {currentRoomUsers.length - 4} mehr</li>
-                  )}
-                </ul>
+    <div className="flex mt-10 justify-center">
+      <div className="flex md:w-1/2 w-11/12 mt-10 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
+        {socketConnected && dbConnected && userName != "" ? (
+          <div className="w-full">
+            <div className="flex justify-between items-end mb-3">
+              <div>
+                <div className="flex">
+                  <h1 className="md:text-lg text-base font-bold text-white">{`${userName}`}</h1>
+                  <h1 className="mx-1 md:text-lg text-base font-bold text-white">
+                    |
+                  </h1>
+                  <h1 className="md:text-lg text-base font-bold text-white">{`${roomName}`}</h1>
+                </div>
+
+                <div>
+                  <ul className="flex">
+                    {currentRoomUsers.slice(0, 3).map((user, index, arr) => (
+                      <li key={index} className="md:text-sm text-xs text-white">
+                        {user}
+                        {index < arr.length - 1 ? "|" : ""}
+                      </li>
+                    ))}
+                    {currentRoomUsers.length > 3 && (
+                      <li className="md:text-sm text-xs ms-1 text-white">
+                        und {currentRoomUsers.length - 3} mehr
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <button
+                  className="px-1 py-1 md:px-2 md:py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+                  onClick={handleLeaveRoom}
+                >
+                  <ExitToAppIcon />
+                </button>
               </div>
             </div>
-            <div>
-              <button
-                className="px-1 py-1 md:px-2 md:py-2 text-white bg-red-500 rounded-lg flex justify-center items-center"
-                onClick={handleLeaveRoom}
-              >
-                <ExitToAppIcon />
-              </button>
+
+            <div className="md:h-[450px] h-[300px] overflow-y-auto p-2 ext-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
+              {messages.map((messageObject: any, index: number) => (
+                <ChatMessage
+                  key={index}
+                  id={messageObject.id}
+                  sender={messageObject.userName}
+                  message={messageObject.message}
+                  isOwnMessage={messageObject.userName === userName}
+                  timestamp={messageObject.timestamp}
+                  onDelete={() => deleteMessage(messageObject.id)}
+                  onEdit={() => {
+                    setEditMessageID(messageObject.id);
+                    const imageUrl = extractImageUrl(messageObject.message);
+                    setEditImageUrl(imageUrl);
+                    setEditBaseText(
+                      removeImageUrlFromMessage(messageObject.message)
+                    );
+                  }}
+                  onRespond={() => setResponseToMessage(messageObject)}
+                  userName={userName}
+                  isEditing={editMessageID === messageObject.id}
+                  edited={messageObject.edited}
+                  response={messageObject.response}
+                />
+              ))}
+
+              <div ref={chatEndRef} />
             </div>
-          </div>
 
-          <div className="md:h-[450px] h-[300px] overflow-y-auto p-4 bg-gray-200 border-2 rounded-lg border-gray-300 no-scrollbar">
-            {messages.map((messageObject: any, index: number) => (
-              <ChatMessage
-                key={index}
-                id={messageObject.id}
-                sender={messageObject.userName}
-                message={messageObject.message}
-                isOwnMessage={messageObject.userName === userName}
-                timestamp={messageObject.timestamp}
-                onDelete={() => deleteMessage(messageObject.id)}
-                onEdit={() => {
-                  setEditMessageID(messageObject.id);
-                  const imageUrl = extractImageUrl(messageObject.message);
-                  setEditImageUrl(imageUrl);
-                  setEditBaseText(
-                    removeImageUrlFromMessage(messageObject.message)
-                  );
-                }}
-                onRespond={() => setResponseToMessage(messageObject)}
-                userName={userName}
-                isEditing={editMessageID === messageObject.id}
-                edited={messageObject.edited}
-                response={messageObject.response}
+            <div className="text-sm text-white italic px-2 absolute mt-[-25px]">
+              {typingUsers.length === 1 && `${typingUsers[0]} is typing...`}
+              {typingUsers.length === 2 &&
+                `${typingUsers[0]} and ${typingUsers[1]} are typing...`}
+              {typingUsers.length > 2 &&
+                `${typingUsers[0]} and ${
+                  typingUsers.length - 1
+                } more are typing...`}
+            </div>
+
+            {editMessageID === "" ? (
+              <ChatForm
+                onSendMessage={handleSendMessage}
+                onTyping={handleTyping}
+                isEditing={false}
+                responseToMessage={responseToMessage}
+                onCancelResponse={() => setResponseToMessage(null)}
               />
-            ))}
-
-            <div ref={chatEndRef} />
+            ) : (
+              <ChatForm
+                onSendMessage={(message: string) =>
+                  editMessage(editMessageID, message)
+                }
+                onTyping={handleTyping}
+                isEditing={true}
+                responseToMessage={responseToMessage}
+                onCancelResponse={() => setResponseToMessage(null)}
+                initialText={editBaseText}
+                initialImageUrl={editImageUrl}
+              />
+            )}
           </div>
-
-          <div className="text-sm text-gray-500 italic px-2 absolute mt-[-25px]">
-            {typingUsers.length === 1 && `${typingUsers[0]} is typing...`}
-            {typingUsers.length === 2 &&
-              `${typingUsers[0]} and ${typingUsers[1]} are typing...`}
-            {typingUsers.length > 2 &&
-              `${typingUsers[0]} and ${
-                typingUsers.length - 1
-              } more are typing...`}
+        ) : (
+          <div className="text-center">
+            <h1 className="text-lg font-semibold text-white">
+              Connecting to
+              {!dbConnected && !socketConnected && " database and server..."}
+              {!dbConnected && socketConnected && " database..."}
+              {dbConnected && !socketConnected && " server..."}
+            </h1>
+            <p className="text-sm text-white">Please wait</p>
           </div>
-
-          {editMessageID === "" ? (
-            <ChatForm
-              onSendMessage={handleSendMessage}
-              onTyping={handleTyping}
-              isEditing={false}
-              responseToMessage={responseToMessage}
-              onCancelResponse={() => setResponseToMessage(null)}
-            />
-          ) : (
-            <ChatForm
-              onSendMessage={(message: string) =>
-                editMessage(editMessageID, message)
-              }
-              onTyping={handleTyping}
-              isEditing={true}
-              responseToMessage={responseToMessage}
-              onCancelResponse={() => setResponseToMessage(null)}
-              initialText={editBaseText}
-              initialImageUrl={editImageUrl}
-            />
-          )}
-        </div>
-      ) : (
-        <div className="text-center w-full">
-          <h1 className="text-lg font-semibold text-gray-700">
-            Connecting to
-            {!dbConnected && !socketConnected && " database and server..."}
-            {!dbConnected && socketConnected && " database..."}
-            {dbConnected && !socketConnected && " server..."}
-          </h1>
-          <p className="text-sm text-gray-500">Please wait</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

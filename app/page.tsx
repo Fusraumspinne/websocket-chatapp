@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 
 // Reaktionen auf Nachrichten
 // Design überarbietn wie das OG-FLopperChat
@@ -99,124 +99,130 @@ export default function Home() {
   }, [autoJoin]);
 
   return (
-    <div className="flex mt-10 jusify-center w-full">
-      <div className="flex w-full max-w-3xl mx-auto flex-col items-center">
-        {!showRooms ? (
-          <>
-            <h1 className="md:mb-4 mb-2 text-2xl font-bold text-gray-700">
-              Join a Room
-            </h1>
-            <input
-              placeholder="Enter a username..."
-              onKeyDown={handleKeyPressRoom}
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              type="text"
-              name="message"
-              className="w-64 px-4 py-2 md:mb-4 mb-2 border-2 rounded-lg border-gray-300 focus:outline-none"
-            />
-            <input
-              placeholder="Enter a room..."
-              onKeyDown={handleKeyPressRoom}
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              type="text"
-              name="message"
-              className="w-64 px-4 py-2 md:mb-4 mb-2 border-2 rounded-lg border-gray-300 focus:outline-none"
-            />
-            <button
-              className="w-64 px-4 py-2 text-white bg-green-500 rounded-lg"
-              onClick={() => joinRoomFunction("")}
-            >
-              Join Room
-            </button>
-            <button
-              className="w-64 px-4 py-2 text-white bg-blue-500 rounded-lg  md:mt-4 mt-2"
-              onClick={() => setShowRooms(true)}
-            >
-              Show Rooms
-            </button>
-          </>
-        ) : socketConnected ? (
-          <>
-            <h1 className="md:mb-4 mb-2 text-2xl font-bold text-gray-700">
-              Open Rooms
-            </h1>
-            <ul className="border-2 rounded-lg border-gray-300 w-64 p-1">
-              {roomsList && Object.keys(roomsList).length > 0 ? (
-                Object.keys(roomsList).map((room, index) => (
-                  <li
-                    key={index}
-                    onClick={() => joinRoomFunction(room)}
-                    className="cursor-pointer"
-                  >
-                    <h1 className="text-lg font-semibold underline text-gray-700">
-                      Room: {room}
-                    </h1>
-                    <h2 className="text-base text-gray-600">Users:</h2>
-                    <ul className="flex flex-wrap">
-                      {roomsList[room]?.users?.length > 0 ? (
-                        roomsList[room].users.map(
-                          (user: string, userIndex: number) => (
-                            <li
-                              className="text-sm text-gray-600 me-1"
-                              key={userIndex}
-                            >
-                              {user}
-                              {userIndex < roomsList[room]?.users.length - 1
-                                ? ","
-                                : ""}
-                            </li>
+    <div className="flex justify-center">
+      <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+        <div className="flex mx-auto flex-col items-center">
+          {!showRooms ? (
+            <>
+              <h1 className="mb-3 text-2xl font-bold text-white">
+                Join a Room
+              </h1>
+              <input
+                placeholder="Enter a username..."
+                onKeyDown={handleKeyPressRoom}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                type="text"
+                name="message"
+                className="w-64 px-4 py-2 mb-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
+              />
+              <input
+                placeholder="Enter a room..."
+                onKeyDown={handleKeyPressRoom}
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+                type="text"
+                name="message"
+                className="w-64 px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
+              />
+              <div className="custom-blur border custom-border w-64 my-3"></div>
+              <button
+                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border mb-2 rounded-2xl"
+                onClick={() => joinRoomFunction("")}
+              >
+                Join Room
+              </button>
+              <button
+                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border rounded-2xl"
+                onClick={() => setShowRooms(true)}
+              >
+                Show Rooms
+              </button>
+            </>
+          ) : socketConnected ? (
+            <>
+              <h1 className="mb-3 text-2xl font-bold text-white">Open Rooms</h1>
+              <ul className="custom-blur border-2 custom-border rounded-2xl w-64 p-3">
+                {roomsList && Object.keys(roomsList).length > 0 ? (
+                  Object.keys(roomsList).map((room, index, arr) => (
+                    <li
+                      key={index}
+                      onClick={() => joinRoomFunction(room)}
+                      className="cursor-pointer"
+                    >
+                      <h1 className="text-lg font-semibold underline text-white">
+                        {room}
+                      </h1>
+                      <ul className="flex flex-wrap">
+                        {roomsList[room]?.users?.length > 0 ? (
+                          roomsList[room].users.map(
+                            (user: string, userIndex: number) => (
+                              <li
+                                className="text-sm text-white me-1"
+                                key={userIndex}
+                              >
+                                {user}
+                                {userIndex < roomsList[room]?.users.length - 1
+                                  ? ","
+                                  : ""}
+                              </li>
+                            )
                           )
-                        )
-                      ) : (
-                        <li className="text-sm text-gray-500">
-                          No users in this room
-                        </li>
+                        ) : (
+                          <li className="text-sm text-white">
+                            No users in this room
+                          </li>
+                        )}
+                      </ul>
+                      {index < arr.length - 1 && (
+                        <div className="custom-blur border custom-border rounded-2xl w-56 my-3"></div>
                       )}
-                    </ul>
-                  </li>
-                ))
-              ) : (
-                <p className="text-gray-500 text-center">No open rooms</p>
-              )}
-            </ul>
-            <div className="w-64 my-2">
-              <div className="border rounded-lg border-gray-300"></div>
-              <h1 className="text-lg font-bold text-gray-700">Popular Rooms</h1>
-              <div
-                onClick={() => joinRoomFunction("GoofyPictures")}
-                className="cursor-pointer"
-              >
-                <h1 className="text-base font-semibold underline text-gray-700">
-                  GoofyPictures
-                </h1>                
-              </div>
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-white text-center">No open rooms</p>
+                )}
+              </ul>
+              <div className="w-64 my-3">
+                <div className="custom-blur border custom-border rounded-2xl"></div>
+                <h1 className="text-lg font-bold text-white mt-1">
+                  Popular Rooms
+                </h1>
+                <div
+                  onClick={() => joinRoomFunction("GoofyPictures")}
+                  className="cursor-pointer"
+                >
+                  <h1 className="text-base font-semibold underline  text-white">
+                    GoofyPictures
+                  </h1>
+                </div>
 
-              <div
-                onClick={() => joinRoomFunction("MainChannel")}
-                className="cursor-pointer"
-              >
-                <h1 className="text-base font-semibold underline text-gray-700">
-                  MainChannel
-                </h1>                
+                <div
+                  onClick={() => joinRoomFunction("MainChannel")}
+                  className="cursor-pointer"
+                >
+                  <h1 className="text-base font-semibold underline  text-white">
+                    MainChannel
+                  </h1>
+                </div>
               </div>
+              <div className="custom-blur border custom-border w-64"></div>
+              <button
+                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border rounded-2xl mt-3"
+                onClick={() => setShowRooms(false)}
+              >
+                Back
+              </button>
+            </>
+          ) : (
+            <div className="text-center">
+              <h1 className="text-lg font-semibold  text-white">
+                Connecting to server...
+              </h1>
+              <p className="text-sm text-white">Please wait</p>
             </div>
-            <button
-              className="w-64 px-4 py-2 text-white bg-blue-500 rounded-lg md:mt-4 mt-2"
-              onClick={() => setShowRooms(false)}
-            >
-              Back
-            </button>
-          </>
-        ) : (
-          <div className="text-center">
-            <h1 className="text-lg font-semibold text-gray-700">
-              Connecting to server...
-            </h1>
-            <p className="text-sm text-gray-500">Please wait</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

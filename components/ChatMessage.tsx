@@ -97,7 +97,9 @@ const ChatMessage = ({
   }
 
   return (
-    <div>
+    <div
+      className={`${isOwnMessage ? "ms-3" : isSystemMessage ? "mx-3" : "me-3"}`}
+    >
       <div
         className={`flex ${
           isSystemMessage
@@ -110,7 +112,7 @@ const ChatMessage = ({
         <div>
           {response !== "" && (
             <div
-              className="border-2 rounded-bl-none rounded-br-none rounded-tl-lg rounded-tr-lg border-gray-300 p-2 bg-gray-300"
+              className="border-2 custom-border custom-blur rounded-bl-none rounded-br-none rounded-tl-lg border-b-0 rounded-tr-lg p-1"
               onClick={() => {
                 const el = document.getElementById(
                   `message-${getResponseId()}`
@@ -125,17 +127,17 @@ const ChatMessage = ({
                 }
               }}
             >
-              <p className="text-xs md:font-medium font-light">{`-->${getResponseUsername()}`}</p>
+              <p className="text-xs md:font-medium font-light text-white">{`-->${getResponseUsername()}`}</p>
               {extractImageUrl(response) && (
                 <Image
                   src={extractImageUrl(response)}
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border rounded-lg border-gray-300 max-w-8 max-h-8 md:max-w-14 md:max-h-14"
+                  className="border custom-border max-w-8 max-h-8 md:max-w-14 md:max-h-14"
                 />
               )}
-              <p className="text-xs md:font-medium font-light">
+              <p className="text-xs md:font-medium font-light text-white">
                 {getResponseMessage().length > 18
                   ? getResponseMessage().slice(0, 18) + "..."
                   : getResponseMessage()}
@@ -146,18 +148,18 @@ const ChatMessage = ({
           <div
             id={`message-${id}`}
             onClick={() => toggleQuickMenu()}
-            className={`border-2 ${
+            className={`text-white border-2 custom-border custom-blur ${
               response !== ""
                 ? "rounded-tl-none rounded-tr-none rounded-bl-lg rounded-br-lg"
                 : "rounded-lg"
-            } border-gray-300 max-w-xs md:px-4 px-2 md:py-2 py-1 ${
-              isSystemMessage
-                ? "bg-gray-800 text-white text-center md:text-xs text-sm"
-                : isEditing
-                ? "bg-gray-500 text-white"
-                : isOwnMessage
-                ? "bg-blue-500 text-white"
-                : "bg-white text-black"
+            } ${
+              isOwnMessage
+                ? "rounded-br-none"
+                : isSystemMessage
+                ? "rounded-lg"
+                : "rounded-bl-none"
+            } max-w-xs md:px-4 px-2 md:py-2 py-1 ${
+              isSystemMessage ? "text-center md:text-xs text-sm" : ""
             }`}
           >
             {!isSystemMessage && (
@@ -173,7 +175,7 @@ const ChatMessage = ({
                   alt="Image"
                   width={1080}
                   height={1080}
-                  className="border-2 rounded-lg border-gray-300 max-w-40 max-h-40 md:max-w-56 md:max-h-56"
+                  className="border-2 custom-border max-w-40 max-h-40 md:max-w-56 md:max-h-56"
                 />
               </div>
             )}
@@ -187,36 +189,41 @@ const ChatMessage = ({
             </div>
 
             {quickMenu && (
-              <div className="flex items-center">
-                <button
-                  onClick={(e) => editMessage(e)}
-                  className="flex justify-center items-center me-1 w-1/3 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"
-                >
-                  <EditRoundedIcon style={{ fontSize: "16px" }} />
-                </button>
-                <button
-                  onClick={(e) => deleteMessage(e)}
-                  className="flex justify-center items-center  w-1/3 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"
-                >
-                  <DeleteRoundedIcon style={{ fontSize: "16px" }} />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setQuickMenu(false);
-                  }}
-                  className="flex justify-center items-center ms-1 w-1/3 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"
-                >
-                  <CloseRoundedIcon style={{ fontSize: "16px" }} />
-                </button>
+              <div className="flex flex-col">
+                <div className="mt-2 mb-1 custom-blur border custom-border rounded-2xl"></div>
+                <div className="flex items-center">
+                  <button
+                    onClick={(e) => editMessage(e)}
+                    className="flex justify-center items-center me-1 w-1/3 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"
+                  >
+                    <EditRoundedIcon style={{ fontSize: "16px" }} />
+                  </button>
+                  <button
+                    onClick={(e) => deleteMessage(e)}
+                    className="flex justify-center items-center  w-1/3 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"
+                  >
+                    <DeleteRoundedIcon style={{ fontSize: "16px" }} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQuickMenu(false);
+                    }}
+                    className="flex justify-center items-center ms-1 w-1/3 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"
+                  >
+                    <CloseRoundedIcon style={{ fontSize: "16px" }} />
+                  </button>
+                </div>
               </div>
             )}
 
             {responseMenu && (
-              <div className="flex items-center">
+              <div className="flex flex-col">
+                <div className="mt-2 mb-1 custom-blur border custom-border rounded-2xl"></div>
+                <div className="flex items-center">
                 <button
                   onClick={(e) => respondMessage(e)}
-                  className="flex justify-center items-center me-1 w-1/2 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"
+                  className="flex justify-center items-center me-1 w-1/2 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"
                 >
                   <RateReviewIcon style={{ fontSize: "16px" }} />
                 </button>
@@ -225,10 +232,11 @@ const ChatMessage = ({
                     e.stopPropagation();
                     setResponseMenu(false);
                   }}
-                  className="flex justify-center items-center ms-1 w-1/2 px-2 py-1 text-black bg-gray-200 border-2 rounded-lg border-gray-300 md:mt-2 mt-1"
+                  className="flex justify-center items-center ms-1 w-1/2 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"
                 >
                   <CloseRoundedIcon style={{ fontSize: "16px" }} />
                 </button>
+              </div>
               </div>
             )}
           </div>
