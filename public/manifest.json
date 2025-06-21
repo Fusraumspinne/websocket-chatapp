@@ -3,8 +3,8 @@
   "short_name": "Flopper Chat",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#dad2e1",
+  "theme_color": "#dad2e1",
   "icons": [
     {
       "src": "/icon-192.png",

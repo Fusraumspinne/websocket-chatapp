@@ -62,24 +62,29 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!socket) {
-      const SERVER_URL =
-        window.location.hostname === "localhost"
-          ? "http://localhost:3000"
-          : "https://websocket-chatapp-server.onrender.com";
+    const SERVER_URL =
+      window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : "https://websocket-chatapp-server.onrender.com";
 
-      const newSocket = io(SERVER_URL);
+    const newSocket = io(SERVER_URL);
 
-      newSocket.on("roomsList", (rooms) => {
-        setRoomsList(rooms);
-        setSocketConnected(true);
-      });
+    const handleRoomsList = (rooms: any) => {
+      setRoomsList(rooms);
+      setSocketConnected(true);
+    };
 
-      setSocket(newSocket);
-    } else {
-      socket.emit("getRooms");
-    }
-  }, [socket]);
+    newSocket.on("roomsList", handleRoomsList);
+
+    setSocket(newSocket);
+
+    newSocket.emit("getRooms");
+
+    return () => {
+      newSocket.off("roomsList", handleRoomsList);
+      newSocket.disconnect();
+    };
+  }, []);
 
   const handleKeyPressRoom = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -97,27 +102,6 @@ export default function Home() {
       setAutoJoin(false);
     }
   }, [autoJoin]);
-
-  const testFunction = (systemMessage: string) => {
-    const now = new Date();
-    const formattedDate = now.toLocaleString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
-
-    const messageData = {
-      id: uuidv4(),
-      message: systemMessage,
-      userName: "System",
-      timestamp: formattedDate,
-    };
-    socket.emit("adminMessage", messageData);
-  }
 
   return (
     <div className="flex justify-center">
@@ -217,7 +201,7 @@ export default function Home() {
                     MainChannel
                   </h1>
                 </div>
-                
+
                 <div
                   onClick={() => joinRoomFunction("GoofyPictures")}
                   className="cursor-pointer"

@@ -29,7 +29,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [currentRoomUsers, setCurrentRoomUsers] = useState<string[]>([]);
 
   const [editMessageID, setEditMessageID] = useState<string>("");
-  const [responseToMessage, setResponseToMessage] = useState<any | null>({id: "", userName: "", message: "",});
+  const [responseToMessage, setResponseToMessage] = useState<any | null>({
+    id: "",
+    userName: "",
+    message: "",
+  });
 
   const [editBaseText, setEditBaseText] = useState<string>("");
   const [editImageUrl, setEditImageUrl] = useState<string>("");
@@ -116,11 +120,20 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       edited: false,
       response,
     };
+
     socket.emit("message", messageData);
+
+    if (message.toLowerCase().includes("nigger")) {
+      allMessage(`⚠️${userName} dropped the N-Word⚠️`);
+    }
     setIsTyping(false);
     socket.emit("stopTyping", { userName, roomName });
     saveMessage(messageData);
-    setResponseToMessage(null);
+    setResponseToMessage({
+      id: "",
+      userName: "",
+      message: "",
+    });
   };
 
   const saveMessage = async (messageData: any) => {
@@ -206,49 +219,63 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   };
 
   useEffect(() => {
-    if (!socket) {
-      const SERVER_URL =
-        window.location.hostname === "localhost"
-          ? "http://localhost:3000"
-          : "https://websocket-chatapp-server.onrender.com";
+    const SERVER_URL =
+      window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : "https://websocket-chatapp-server.onrender.com";
 
-      const newSocket = io(SERVER_URL);
+    const newSocket = io(SERVER_URL);
 
-      newSocket.on("message", (messageObject) => {
-        setMessages((prevMessages: any) => [...prevMessages, messageObject]);
-      });
+    const handleAdminMessage = (messageObject: any) => {
+      setMessages((prevMessages: any) => [...prevMessages, messageObject]);
+    };
+    const handleMessage = (messageObject: any) => {
+      setMessages((prevMessages: any) => [...prevMessages, messageObject]);
+    };
+    const handleDeleteMessage = (id: string) => {
+      setMessages((prevMessages: any) =>
+        prevMessages.filter((message: any) => message.id !== id)
+      );
+    };
+    const handleEditMessage = (messageObject: any) => {
+      setMessages((prevMessages: any) =>
+        prevMessages.map((msg: any) =>
+          msg.id === messageObject.id
+            ? { ...msg, message: messageObject.message, edited: true }
+            : msg
+        )
+      );
+    };
+    const handleRoomUsers = (users: string[]) => {
+      setCurrentRoomUsers(users);
+      setSocketConnected(true);
+    };
+    const handleTypingUsers = (users: string[]) => {
+      const filteredUsers = users.filter(
+        (user: string) => user !== userNameRef.current
+      );
+      setTypingUsers(filteredUsers);
+    };
 
-      newSocket.on("deleteMessage", (id: string) => {
-        setMessages((prevMessages: any) =>
-          prevMessages.filter((message: any) => message.id !== id)
-        );
-      });
+    newSocket.on("adminMessage", handleAdminMessage);
+    newSocket.on("message", handleMessage);
+    newSocket.on("deleteMessage", handleDeleteMessage);
+    newSocket.on("editMessage", handleEditMessage);
+    newSocket.on("roomUsers", handleRoomUsers);
+    newSocket.on("typingUsers", handleTypingUsers);
 
-      newSocket.on("editMessage", (messageObject) => {
-        setMessages((prevMessages: any) =>
-          prevMessages.map((msg: any) =>
-            msg.id === messageObject.id
-              ? { ...msg, message: messageObject.message, edited: true }
-              : msg
-          )
-        );
-      });
+    setSocket(newSocket);
 
-      newSocket.on("roomUsers", (users) => {
-        setCurrentRoomUsers(users);
-        setSocketConnected(true);
-      });
-
-      newSocket.on("typingUsers", (users) => {
-        const filteredUsers = users.filter(
-          (user: string) => user !== userNameRef.current
-        );
-        setTypingUsers(filteredUsers);
-      });
-
-      setSocket(newSocket);
-    }
-  }, [socket]);
+    return () => {
+      newSocket.off("adminMessage", handleAdminMessage);
+      newSocket.off("message", handleMessage);
+      newSocket.off("deleteMessage", handleDeleteMessage);
+      newSocket.off("editMessage", handleEditMessage);
+      newSocket.off("roomUsers", handleRoomUsers);
+      newSocket.off("typingUsers", handleTypingUsers);
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -311,6 +338,16 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     const imageRegex = /(https:\/\/dl\.dropboxusercontent\.com[^\s]+)/;
     return message.replace(imageRegex, "").trim();
   }
+
+  const allMessage = (systemMessage: string) => {
+    const messageData = {
+      id: uuidv4(),
+      message: systemMessage,
+      userName: "System",
+      timestamp: getDate(),
+    };
+    socket.emit("adminMessage", messageData);
+  };
 
   return (
     <div className="flex justify-center">
