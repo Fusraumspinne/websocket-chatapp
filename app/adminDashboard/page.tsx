@@ -7,11 +7,12 @@ import AdminChatForm from "@/components/AdminDashboardComponents/AdminChatForm";
 import AdminChatMessage from "@/components/AdminDashboardComponents/AdminChatMessage";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SearchIcon from "@mui/icons-material/Search";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/navigation";
 
 // Sehen welch euser gearde online und in welchem chat sind
 // typing indikator
+// responsive für handy buggy bei login und navbar
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -298,7 +299,8 @@ export default function AdminDashboard() {
             <h1 className="mb-3 text-2xl font-bold text-white">
               Admin Dashboard
             </h1>
-            <div className="flex items-center">
+            <div className="flex items-center flex-col md:flex-row">
+              {" "}
               <input
                 type="password"
                 value={passwordInput}
@@ -307,18 +309,20 @@ export default function AdminDashboard() {
                 className="w-64 px-4 py-2 md:me-3 me-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
                 onKeyDown={handleKeyPressLogin}
               />
-              <button
-                className="px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
-                onClick={() => enterDashboard()}
-              >
-                <LoginIcon />
-              </button>
-              <button
-                className="md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
-                onClick={() => router.push(`/`)}
-              >
-                <LogoutIcon />
-              </button>
+              <div className="flex items-center w-full md:mt-0 mt-2">
+                <button
+                  className="md:w-auto w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                  onClick={() => enterDashboard()}
+                >
+                  <LoginIcon />
+                </button>
+                <button
+                  className="md:w-auto w-full md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                  onClick={() => router.push(`/`)}
+                >
+                  <LogoutIcon />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -329,7 +333,7 @@ export default function AdminDashboard() {
               className="w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => openLiveChat()}
             >
-              All Chat
+              Chat
             </button>
 
             <button
