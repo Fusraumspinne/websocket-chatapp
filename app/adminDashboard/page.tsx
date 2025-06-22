@@ -7,7 +7,7 @@ import AdminChatForm from "@/components/AdminDashboardComponents/AdminChatForm";
 import AdminChatMessage from "@/components/AdminDashboardComponents/AdminChatMessage";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SearchIcon from "@mui/icons-material/Search";
-import LogOutIcon from "@mui/icons-material/LogOut";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useRouter } from "next/navigation";
 
 // Sehen welch euser gearde online und in welchem chat sind
