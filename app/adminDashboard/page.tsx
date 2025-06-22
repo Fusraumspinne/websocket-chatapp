@@ -317,7 +317,7 @@ export default function AdminDashboard() {
                 className="md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                 onClick={() => router.push(`/`)}
               >
-                <LogOutIcon />
+                <LogoutIcon />
               </button>
             </div>
           </div>
@@ -349,7 +349,7 @@ export default function AdminDashboard() {
               className="md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => router.push(`/`)}
             >
-              <LogOutIcon />
+              <LogoutIcon />
             </button>
           </div>
           <div>
