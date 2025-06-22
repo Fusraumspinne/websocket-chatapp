@@ -277,10 +277,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     };
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleTyping = () => {
     if (!isTyping && editMessageID === "") {
       setIsTyping(true);
@@ -311,6 +307,10 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
     return formattedDate;
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
     if (chatEndRef.current) {
@@ -390,7 +390,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <div className="md:h-[500px] h-[350px] overflow-y-auto p-2 ext-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
+            <div className="md:h-[500px] h-[350px] overflow-y-auto p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
               {messages.map((messageObject: any, index: number) => (
                 <ChatMessage
                   key={index}
@@ -410,7 +410,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
                   }}
                   onRespond={() => setResponseToMessage(messageObject)}
                   userName={userName}
-                  isEditing={editMessageID === messageObject.id}
                   edited={messageObject.edited}
                   response={messageObject.response}
                 />

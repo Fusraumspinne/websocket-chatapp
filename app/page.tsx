@@ -4,11 +4,9 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
-import { v4 as uuidv4 } from "uuid";
 
 // Reaktionen auf Nachrichten
 // Beim löschen wird auch das bild aus dropbox gelöscht
-// Special word event mit location
 
 // Account
 // Bisher genutze Rooms werden gespeichert
@@ -23,7 +21,6 @@ import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const router = useRouter();
-  const [socket, setSocket] = useState<any>(undefined);
 
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
 
@@ -56,9 +53,11 @@ export default function Home() {
   };
 
   const handleJoinRoom = () => {
-    setShowRooms(false);
-    localStorage.setItem("Username", userName);
-    router.push(`/chat/${encodeURIComponent(roomName)}`);
+    if (roomName !== "AdminDashboard") {
+      setShowRooms(false);
+      localStorage.setItem("Username", userName);
+      router.push(`/chat/${encodeURIComponent(roomName)}`);
+    }
   };
 
   useEffect(() => {
@@ -75,8 +74,6 @@ export default function Home() {
     };
 
     newSocket.on("roomsList", handleRoomsList);
-
-    setSocket(newSocket);
 
     newSocket.emit("getRooms");
 
@@ -148,45 +145,50 @@ export default function Home() {
             <>
               <h1 className="mb-3 text-2xl font-bold text-white">Open Rooms</h1>
               <ul className="custom-blur border-2 custom-border rounded-2xl w-64 p-3">
-                {roomsList && Object.keys(roomsList).length > 0 ? (
-                  Object.keys(roomsList).map((room, index, arr) => (
-                    <li
-                      key={index}
-                      onClick={() => joinRoomFunction(room)}
-                      className="cursor-pointer"
-                    >
-                      <h1 className="text-lg font-semibold underline text-white">
-                        {room}
-                      </h1>
-                      <ul className="flex flex-wrap">
-                        {roomsList[room]?.users?.length > 0 ? (
-                          roomsList[room].users.map(
-                            (user: string, userIndex: number) => (
-                              <li
-                                className="text-sm text-white me-1"
-                                key={userIndex}
-                              >
-                                {user}
-                                {userIndex < roomsList[room]?.users.length - 1
-                                  ? ","
-                                  : ""}
-                              </li>
+                {(() => {
+                  const filteredRooms = Object.keys(roomsList).filter(
+                    (room) => room !== "AdminDashboard"
+                  );
+                  return filteredRooms.length > 0 ? (
+                    filteredRooms.map((room, index, arr) => (
+                      <li
+                        key={index}
+                        onClick={() => joinRoomFunction(room)}
+                        className="cursor-pointer"
+                      >
+                        <h1 className="text-lg font-semibold underline text-white">
+                          {room}
+                        </h1>
+                        <ul className="flex flex-wrap">
+                          {roomsList[room]?.users?.length > 0 ? (
+                            roomsList[room].users.map(
+                              (user: string, userIndex: number) => (
+                                <li
+                                  className="text-sm text-white me-1"
+                                  key={userIndex}
+                                >
+                                  {user}
+                                  {userIndex < roomsList[room]?.users.length - 1
+                                    ? ","
+                                    : ""}
+                                </li>
+                              )
                             )
-                          )
-                        ) : (
-                          <li className="text-sm text-white">
-                            No users in this room
-                          </li>
+                          ) : (
+                            <li className="text-sm text-white">
+                              No users in this room
+                            </li>
+                          )}
+                        </ul>
+                        {index < arr.length - 1 && (
+                          <div className="custom-blur border custom-border rounded-2xl w-56 my-3"></div>
                         )}
-                      </ul>
-                      {index < arr.length - 1 && (
-                        <div className="custom-blur border custom-border rounded-2xl w-56 my-3"></div>
-                      )}
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-white text-center">No open rooms</p>
-                )}
+                      </li>
+                    ))
+                  ) : (
+                    <p className="text-white text-center">No open rooms</p>
+                  );
+                })()}
               </ul>
               <div className="w-64 my-3">
                 <div className="custom-blur border custom-border rounded-2xl"></div>
@@ -211,6 +213,20 @@ export default function Home() {
                   </h1>
                 </div>
               </div>
+
+              <div className="custom-blur border custom-border w-64"></div>
+
+              <div className="w-64 my-2">
+                <div
+                  onClick={() => router.push(`/adminDashboard`)}
+                  className="cursor-pointer"
+                >
+                  <h1 className="text-base font-semibold underline  text-white">
+                    Admin Dashboard
+                  </h1>
+                </div>
+              </div>
+
               <div className="custom-blur border custom-border w-64"></div>
               <button
                 className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border rounded-2xl mt-3"

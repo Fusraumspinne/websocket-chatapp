@@ -132,7 +132,7 @@ const ChatForm = ({
           placeholder={
             isEditing
               ? "Edit your message"
-              : responseToMessage
+              : responseToMessage.id !== ""
               ? "Answer that message"
               : "Type your message"
           }
