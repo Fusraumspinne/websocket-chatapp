@@ -78,7 +78,7 @@ const ChatForm = ({
       return;
     }
 
-    if (message.trim() !== "") {
+    if (message.trim() !== "" || imageUrl) {
       const combined = message.trim() + (imageUrl ? `\n${imageUrl}` : "");
       onSendMessage(combined);
       setMessage("");
