@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 
 // Sehen welch euser gearde online und in welchem chat sind
 // typing indikator
-// responsive für handy buggy bei login und navbar
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -294,7 +293,7 @@ export default function AdminDashboard() {
   return (
     <div className="flex justify-center">
       {!loggedIn ? (
-        <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+        <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl md:p-3 p-2">
           <div className="flex flex-col items-center">
             <h1 className="mb-3 text-2xl font-bold text-white">
               Admin Dashboard
@@ -305,19 +304,19 @@ export default function AdminDashboard() {
                 type="password"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Enter password"
-                className="w-64 px-4 py-2 md:me-3 me-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
+                placeholder="Enter password..."
+                className="w-64 px-4 py-2 md:me-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
                 onKeyDown={handleKeyPressLogin}
               />
               <div className="flex items-center w-full md:mt-0 mt-2">
                 <button
-                  className="md:w-auto w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                  className="md:w-auto w-full p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                   onClick={() => enterDashboard()}
                 >
                   <LoginIcon />
                 </button>
                 <button
-                  className="md:w-auto w-full md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                  className="md:w-auto w-full ms-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                   onClick={() => router.push(`/`)}
                 >
                   <LogoutIcon />
@@ -330,27 +329,27 @@ export default function AdminDashboard() {
         <div className="flex md:w-1/2 w-11/12 mt-10 flex-col border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
           <div className="flex justify-between items-center w-full">
             <button
-              className="w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+              className="w-full p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => openLiveChat()}
             >
               Chat
             </button>
 
             <button
-              className="md:mx-3 mx-2 w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+              className="md:mx-3 mx-2 w-full p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => openRooms()}
             >
               Rooms
             </button>
 
             <button
-              className="w-full px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+              className="w-full p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => openUsers()}
             >
               Users
             </button>
             <button
-              className="md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+              className="md:ms-3 ms-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
               onClick={() => router.push(`/`)}
             >
               <LogoutIcon />
@@ -359,7 +358,7 @@ export default function AdminDashboard() {
           <div>
             {allChatWindow && (
               <div className="border-2 custom-blur custom-border rounded-2xl md:mt-3 mt-2 md:p-3 p-2">
-                <div className="md:h-[450px] h-[300px] overflow-y-auto p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
                   {messages.map((messageObject: any, index: number) => (
                     <AdminChatMessage
                       key={index}
@@ -409,7 +408,7 @@ export default function AdminDashboard() {
                     <h1 className="text-lg font-semibold text-white">Rooms</h1>
                     <div className="flex items-center">
                       <input
-                        placeholder="Search a room"
+                        placeholder="Search a room..."
                         type="text"
                         className="w-full px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none md:mt-3 mt-2"
                         value={roomSearch}
@@ -417,7 +416,7 @@ export default function AdminDashboard() {
                       />
                       <button
                         disabled={true}
-                        className="md:mt-3 mt-2 md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                        className="md:mt-3 mt-2 md:ms-3 ms-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                       >
                         <SearchIcon />
                       </button>
@@ -442,7 +441,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div>
-                    <div className="md:h-[450px] h-[300px] overflow-y-auto p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                    <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
                       {messages
                         .filter((msg: any) => msg.roomName === selectedRoom)
                         .map((messageObject: any, index: number) => (
@@ -478,7 +477,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex">
                       <button
-                        className="md:me-3 me-2 md:mt-3 mt-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                        className="md:me-3 me-2 md:mt-3 mt-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                         onClick={() => setSelectedRoom("")}
                       >
                         <ArrowBackIcon />
@@ -517,7 +516,7 @@ export default function AdminDashboard() {
                     <h1 className="text-lg font-semibold text-white">Users</h1>
                     <div className="flex items-center">
                       <input
-                        placeholder="Search a user"
+                        placeholder="Search a user..."
                         type="text"
                         className="w-full px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none md:mt-3 mt-2"
                         value={userSearch}
@@ -525,7 +524,7 @@ export default function AdminDashboard() {
                       />
                       <button
                         disabled={true}
-                        className="md:mt-3 mt-2 md:ms-3 ms-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                        className="md:mt-3 mt-2 md:ms-3 ms-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                         onClick={() => setSelectedUser("")}
                       >
                         <SearchIcon />
@@ -551,7 +550,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div>
-                    <div className="md:h-[450px] h-[300px] overflow-y-auto p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                    <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
                       {messages
                         .filter(
                           (messageObject: any) =>
@@ -591,7 +590,7 @@ export default function AdminDashboard() {
 
                     <div className="flex">
                       <button
-                        className="md:me-3 me-2 md:mt-3 mt-2 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
+                        className="md:me-3 me-2 md:mt-3 mt-2 p-2 text-white custom-blur border-2 custom-border rounded-2xl flex items-center justify-center"
                         onClick={() => setSelectedUser("")}
                       >
                         <ArrowBackIcon />
@@ -601,7 +600,7 @@ export default function AdminDashboard() {
                           isEditing={false}
                           socket={socket}
                           inputDisabled={true}
-                          inputPlaceholder="Select a message"
+                          inputPlaceholder="Select a message..."
                         />
                       ) : (
                         <AdminChatForm
@@ -626,7 +625,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       ) : (
-        <div className="mt-10 text-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+        <div className="mt-10 text-center custom-blur border-2 custom-border rounded-2xl md:p-3 p-2">
           <h1 className="text-lg font-semibold text-white">
             Connecting to
             {!dbConnected && !socketConnected && " database and server..."}

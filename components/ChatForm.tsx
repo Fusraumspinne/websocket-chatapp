@@ -96,13 +96,13 @@ const ChatForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col mt-3 relative">
+    <form onSubmit={handleSubmit} className="flex flex-col md:mt-3 mt-2 relative">
       <div className="flex gap-1">
         <div className="hidden md:block">
           <button
             type="button"
             onClick={() => setShowEmojiPicker((f) => !f)}
-            className="px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+            className="me-1 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
           >
             <SentimentSatisfiedAltIcon />
             <span className="sr-only">Emoji Picker</span>
@@ -111,7 +111,7 @@ const ChatForm = ({
 
         <button
           type="button"
-          className="px-1 py-1 md:px-2 md:py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+          className="me-1 px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
           onClick={() => inputFileRef.current?.click()}
         >
           {file ? <DownloadDoneOutlinedIcon /> : <FileUploadOutlinedIcon />}
@@ -131,22 +131,22 @@ const ChatForm = ({
           type="text"
           placeholder={
             isEditing
-              ? "Edit your message"
+              ? "Edit your message..."
               : responseToMessage.id !== ""
-              ? "Answer that message"
-              : "Type your message"
+              ? "Answer that message..."
+              : "Type your message..."
           }
           onChange={(e) => {
             setMessage(e.target.value);
             onTyping();
           }}
-          className="flex-1 px-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none w-full"
+          className="me-1 flex-1 px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none w-full"
           value={message}
         />
 
         <button
           type="submit"
-          className="px-1 py-1 md:px-2 md:py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+          className="px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
           disabled={isUploading}
         >
           {isUploading ? <SyncIcon className="animate-spin" /> : <SendIcon />}

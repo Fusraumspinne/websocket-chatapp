@@ -70,7 +70,7 @@ const AdminChatForm = ({
   }, [initialText, isEditing]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex mt-3 relative w-full">
+    <form onSubmit={handleSubmit} className="flex md:mt-3 mt-2 relative w-full gap-1">
       <input
         ref={inputRef}
         type="text"
@@ -78,20 +78,20 @@ const AdminChatForm = ({
           inputPlaceholder !== ""
             ? inputPlaceholder
             : isEditing
-            ? "Edit your message"
-            : "Type a system message"
+            ? "Edit your message..."
+            : "Type a system message..."
         }
         onChange={(e) => {
           setMessage(e.target.value);
         }}
-        className="md:me-3 me-2 flex-1 px-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none w-full"
+        className="me-1 flex-1 px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none w-full"
         value={message}
         disabled={inputDisabled}
       />
 
       <button
         type="submit"
-        className="px-1 py-1 md:px-2 md:py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+        className="p-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
       >
         <SendIcon />
       </button>

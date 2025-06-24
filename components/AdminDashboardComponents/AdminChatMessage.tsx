@@ -77,11 +77,11 @@ const AdminChatMessage = ({
   }
 
   return (
-    <div className={`${isSystemMessage ? "mx-3" : "me-3"} cursor-pointer`}>
+    <div className={`${isSystemMessage ? "md:mx-3 mx-2" : "md:me-3 me-2"} cursor-pointer`}>
       <div
         className={`flex ${
           isSystemMessage ? "justify-center" : "justify-start"
-        } md:mb-3 mb-1`}
+        } md:mb-3 mb-2`}
       >
         <div>
           {(getResponseId() ||
@@ -168,7 +168,7 @@ const AdminChatMessage = ({
             {quickMenu && (
               <div className="flex flex-col">
                 <div className="mt-2 mb-1 custom-blur border custom-border rounded-2xl"></div>
-                <div className="flex items-center">
+                <div className="flex items-center mb-1">
                   <button
                     onClick={(e) => editMessage(e)}
                     className="flex justify-center items-center me-1 w-1/3 px-2 py-1 text-white custom-blur border-2 custom-border rounded-2xl md:mt-2 mt-1"

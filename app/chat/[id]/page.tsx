@@ -257,12 +257,18 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       setTypingUsers(filteredUsers);
     };
 
+    const handleDisconnect = () => {
+      setSocketConnected(false);
+      router.push("/");
+    };
+
     newSocket.on("adminMessage", handleAdminMessage);
     newSocket.on("message", handleMessage);
     newSocket.on("deleteMessage", handleDeleteMessage);
     newSocket.on("editMessage", handleEditMessage);
     newSocket.on("roomUsers", handleRoomUsers);
     newSocket.on("typingUsers", handleTypingUsers);
+    newSocket.on("disconnect", handleDisconnect);
 
     setSocket(newSocket);
 
@@ -273,6 +279,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       newSocket.off("editMessage", handleEditMessage);
       newSocket.off("roomUsers", handleRoomUsers);
       newSocket.off("typingUsers", handleTypingUsers);
+      newSocket.off("disconnect", handleDisconnect);
       newSocket.disconnect();
     };
   }, []);
@@ -354,7 +361,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
       <div className="flex md:w-1/2 w-11/12 mt-10 justify-center border-2 custom-blur custom-border rounded-2xl md:p-3 p-2">
         {socketConnected && dbConnected && userName != "" ? (
           <div className="w-full">
-            <div className="flex justify-between items-end mb-3">
+            <div className="flex justify-between items-end md:mb-3 mb-2">
               <div>
                 <div className="flex">
                   <h1 className="md:text-lg text-base font-bold text-white">{`${userName}`}</h1>
@@ -382,7 +389,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               </div>
               <div>
                 <button
-                  className="px-1 py-1 md:px-2 md:py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
+                  className="px-2 py-2 text-white custom-blur border-2 custom-border rounded-2xl flex justify-center items-center"
                   onClick={handleLeaveRoom}
                 >
                   <ExitToAppIcon />
@@ -390,7 +397,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <div className="md:h-[500px] h-[350px] overflow-y-auto p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
+            <div className="md:h-[500px] h-[350px] overflow-y-auto md:p-3 p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
               {messages.map((messageObject: any, index: number) => (
                 <ChatMessage
                   key={index}
@@ -418,7 +425,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               <div ref={chatEndRef} />
             </div>
 
-            <div className="text-sm text-white italic px-2 absolute mt-[-25px]">
+            <div className="text-sm text-white italic md:px-3 px-2 absolute mt-[-25px]">
               {typingUsers.length === 1 && `${typingUsers[0]} is typing...`}
               {typingUsers.length === 2 &&
                 `${typingUsers[0]} and ${typingUsers[1]} are typing...`}

@@ -7,16 +7,14 @@ import { useUserStore } from "@/lib/store";
 
 // Reaktionen auf Nachrichten
 // Beim löschen wird auch das bild aus dropbox gelöscht
+// socket verbidnet sich manchmal nicht
+// Links solllen klickbar sein 
+// Umbrüche in nachrichten bei links zumbeispiel
 
 // Account
 // Bisher genutze Rooms werden gespeichert
 // Private Nachrichten
 
-// DevDashboard
-// -> alle nachrichten/nutzer/räume sehen kann
-// -> alles bearbeiten und löschen
-// -> sytstem nachrichten die in allen rooms angezeigt werden
-// -> Nach nutzern und räumen filtern
 // Verschlüsselung der Nachrichten
 
 export default function Home() {
@@ -102,7 +100,7 @@ export default function Home() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl px-3 py-3">
+      <div className="flex mt-10 jusify-center custom-blur border-2 custom-border rounded-2xl md:p-3 p-2">
         <div className="flex mx-auto flex-col items-center">
           {!showRooms ? (
             <>
@@ -116,7 +114,7 @@ export default function Home() {
                 onChange={(e) => setUserName(e.target.value)}
                 type="text"
                 name="message"
-                className="w-64 px-4 py-2 mb-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
+                className="w-64 px-4 py-2 md:mb-3 mb-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
               />
               <input
                 placeholder="Enter a room..."
@@ -127,9 +125,9 @@ export default function Home() {
                 name="message"
                 className="w-64 px-4 py-2 text-white placeholder-white custom-blur border-2 custom-border rounded-2xl focus:outline-none"
               />
-              <div className="custom-blur border custom-border w-64 my-3"></div>
+              <div className="custom-blur border custom-border w-64 md:my-3 my-2"></div>
               <button
-                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border mb-2 rounded-2xl"
+                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border md:mb-3 mb-2 rounded-2xl"
                 onClick={() => joinRoomFunction("")}
               >
                 Join Room
@@ -144,7 +142,7 @@ export default function Home() {
           ) : socketConnected ? (
             <>
               <h1 className="mb-3 text-2xl font-bold text-white">Open Rooms</h1>
-              <ul className="custom-blur border-2 custom-border rounded-2xl w-64 p-3">
+              <ul className="custom-blur border-2 custom-border rounded-2xl w-64 md:p-3 p-2">
                 {(() => {
                   const filteredRooms = Object.keys(roomsList).filter(
                     (room) => room !== "AdminDashboard"
@@ -181,7 +179,7 @@ export default function Home() {
                           )}
                         </ul>
                         {index < arr.length - 1 && (
-                          <div className="custom-blur border custom-border rounded-2xl w-56 my-3"></div>
+                          <div className="custom-blur border custom-border rounded-2xl w-56 md:my-3 my-2"></div>
                         )}
                       </li>
                     ))
@@ -190,9 +188,9 @@ export default function Home() {
                   );
                 })()}
               </ul>
-              <div className="w-64 my-3">
+              <div className="w-64 md:my-3 my-2">
                 <div className="custom-blur border custom-border rounded-2xl"></div>
-                <h1 className="text-lg font-bold text-white mt-1">
+                <h1 className="text-lg font-bold text-white md:mt-2 mt-2">
                   Popular Rooms
                 </h1>
                 <div
@@ -216,7 +214,7 @@ export default function Home() {
 
               <div className="custom-blur border custom-border w-64"></div>
 
-              <div className="w-64 my-2">
+              <div className="w-64 md:my-3 my-2">
                 <div
                   onClick={() => router.push(`/adminDashboard`)}
                   className="cursor-pointer"
@@ -229,7 +227,7 @@ export default function Home() {
 
               <div className="custom-blur border custom-border w-64"></div>
               <button
-                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border rounded-2xl mt-3"
+                className="w-64 px-4 py-2 text-white custom-blur border-2 custom-border rounded-2xl md:mt-3 mt-2"
                 onClick={() => setShowRooms(false)}
               >
                 Back
