@@ -10,9 +10,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/navigation";
 
-// Sehen welch euser gearde online und in welchem chat sind
-// typing indikator
-
 export default function AdminDashboard() {
   const router = useRouter();
   const [socket, setSocket] = useState<any>(undefined);
@@ -231,10 +228,16 @@ export default function AdminDashboard() {
       );
     };
 
+    const handleDisconnect = () => {
+      setSocketConnected(false);
+      router.push("/adminDashboard");
+    };
+
     newSocket.on("adminMessage", handleAdminMessage);
     newSocket.on("message", handleMessage);
     newSocket.on("deleteMessage", handleDeleteMessage);
     newSocket.on("editMessage", handleEditMessage);
+    newSocket.on("disconnect", handleDisconnect);
 
     setSocket(newSocket);
 
@@ -243,6 +246,7 @@ export default function AdminDashboard() {
       newSocket.off("message", handleMessage);
       newSocket.off("deleteMessage", handleDeleteMessage);
       newSocket.off("editMessage", handleEditMessage);
+      newSocket.off("disconnect", handleDisconnect);
       newSocket.disconnect();
     };
   }, []);

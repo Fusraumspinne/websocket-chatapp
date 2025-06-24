@@ -5,17 +5,32 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
 
-// Reaktionen auf Nachrichten
-// Beim löschen wird auch das bild aus dropbox gelöscht
+// Bugs
 // socket verbidnet sich manchmal nicht
+// Beim löschen wird auch das bild aus dropbox gelöscht
+
+// Features
+// Reaktionen auf Nachrichten
 // Links solllen klickbar sein 
 // Umbrüche in nachrichten bei links zumbeispiel
+// Verschlüsselung der Nachrichten
+
+// MongoDB
+// Pagination bei mongodb (nicht alles auf einmal laden)
+// Verbindungspooling mongodb als singleton
+
+// Socket.io
+// typing indikator kan vielleicht zu viele anfragen senden
+// anstatt bei socketio wenn man disconnected umgeleitet zuwerden versuchen den nutzer wieder zu reconnecten
 
 // Account
 // Bisher genutze Rooms werden gespeichert
 // Private Nachrichten
 
-// Verschlüsselung der Nachrichten
+// Admin Dashboard
+// Sehen welch euser gearde online und in welchem chat sind
+// typing indikator
+// Server logs oder so
 
 export default function Home() {
   const router = useRouter();
