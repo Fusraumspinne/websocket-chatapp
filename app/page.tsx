@@ -17,7 +17,6 @@ import { useUserStore } from "@/lib/store";
 
 // MongoDB
 // Pagination bei mongodb (nicht alles auf einmal laden)
-// Verbindungspooling mongodb als singleton
 
 // Socket.io
 // typing indikator kan vielleicht zu viele anfragen senden

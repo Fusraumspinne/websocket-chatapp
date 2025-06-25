@@ -16,12 +16,16 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   const [dbConnected, setDbConnected] = useState<boolean>(false);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [messages, setMessages] = useState<any>([]);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const [roomName, setRoomName] = useState<string>(roomParam);
   const userName = useUserStore((state) => state.userName);
@@ -40,6 +44,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   const chatEndRef = useRef<any>(null);
   const userNameRef = useRef(userName);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   let typingTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
@@ -52,11 +57,20 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     if (socket && userName != "") {
       const timestamp = getDate();
       socket.emit("joinRoom", roomName, userName, timestamp);
-      getPrevMessages();
+      getPrevMessages(1);
     }
   }, [socket]);
 
-  const getPrevMessages = async () => {
+  const handleScroll = async () => {
+    if (!chatContainerRef.current) return;
+    if (chatContainerRef.current.scrollTop === 0 && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      getPrevMessages(nextPage);
+    }
+  };
+
+  const getPrevMessages = async (pageToLoad = page) => {
     if (userName != "") {
       try {
         const resPrevMessages = await fetch("/api/getMessages", {
@@ -64,25 +78,23 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             roomName,
+            page: pageToLoad,
+            pageSize: 20,
           }),
         });
 
         if (resPrevMessages.ok) {
           setDbConnected(true);
           const data = await resPrevMessages.json();
+          if (data.messages.length < 20) setHasMore(false);
           setMessages((prevMessages: any) => {
-            const allMessages = [...prevMessages, ...data.messages];
+            const allMessages = [...data.messages, ...prevMessages];
             const sortedMessages = allMessages.sort(
               (a: any, b: any) =>
                 parseGermanDate(a.timestamp) - parseGermanDate(b.timestamp)
             );
             return sortedMessages;
           });
-        } else {
-          console.error(
-            "Ein Fehler ist beim abrufen der Nachrichten aufgetreten: ",
-            resPrevMessages
-          );
         }
       } catch (error) {
         console.error(
@@ -316,13 +328,40 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (initialLoad) {
+      scrollToBottom();
+      setTimeout(() => setInitialLoad(false), 500);
+    }
+
+    if (!chatContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 200;
+
+    if (isAtBottom ||  messages[messages.length - 1].userName === userName) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   const scrollToBottom = () => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    let attempts = 0;
+    function scroll() {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        if (
+          chatContainerRef.current &&
+          Math.abs(
+            chatContainerRef.current.scrollHeight -
+              chatContainerRef.current.scrollTop -
+              chatContainerRef.current.clientHeight
+          ) > 2 &&
+          attempts < 10
+        ) {
+          attempts++;
+          setTimeout(scroll, 50);
+        }
+      }
     }
+    scroll();
   };
 
   useEffect(() => {
@@ -397,7 +436,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               </div>
             </div>
 
-            <div className="md:h-[500px] h-[350px] overflow-y-auto md:p-3 p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar">
+            <div
+              ref={chatContainerRef}
+              onScroll={handleScroll}
+              className="md:h-[500px] h-[350px] overflow-y-auto md:p-3 p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar"
+            >
               {messages.map((messageObject: any, index: number) => (
                 <ChatMessage
                   key={index}
