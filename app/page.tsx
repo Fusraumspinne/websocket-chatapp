@@ -16,7 +16,6 @@ import { useUserStore } from "@/lib/store";
 // Verschlüsselung der Nachrichten
 
 // MongoDB
-// Pagination bei mongodb (nicht alles auf einmal laden)
 
 // Socket.io
 // typing indikator kan vielleicht zu viele anfragen senden

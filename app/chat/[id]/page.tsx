@@ -45,6 +45,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const chatEndRef = useRef<any>(null);
   const userNameRef = useRef(userName);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [elementRefId, setElementRefId] = useState<string>("");
   let typingTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
@@ -85,6 +86,9 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
         if (resPrevMessages.ok) {
           setDbConnected(true);
+          if (messages[0]) {
+            setElementRefId(messages[0].id);
+          }
           const data = await resPrevMessages.json();
           if (data.messages.length < 20) setHasMore(false);
           setMessages((prevMessages: any) => {
@@ -111,6 +115,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     const [hours, minutes, seconds] = timePart.split(":").map(Number);
     return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
   };
+
+  useEffect(() => {
+    scrollToElement(false);
+    setTimeout(() => setElementRefId(""), 500);
+  }, [elementRefId]);
 
   const handleSendMessage = (message: string) => {
     const messageId = uuidv4();
@@ -258,6 +267,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
         )
       );
     };
+
     const handleRoomUsers = (users: string[]) => {
       setCurrentRoomUsers(users);
       setSocketConnected(true);
@@ -329,7 +339,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (initialLoad) {
-      scrollToBottom();
+      scrollToElement(true);
       setTimeout(() => setInitialLoad(false), 500);
     }
 
@@ -337,30 +347,50 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 200;
 
-    if (isAtBottom ||  messages[messages.length - 1].userName === userName) {
-      scrollToBottom();
+    if (isAtBottom || messages[messages.length - 1].userName === userName) {
+      scrollToElement(true);
     }
   }, [messages]);
 
-  const scrollToBottom = () => {
+  const scrollToElement = (bottom: boolean) => {
     let attempts = 0;
     function scroll() {
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-        if (
-          chatContainerRef.current &&
-          Math.abs(
-            chatContainerRef.current.scrollHeight -
-              chatContainerRef.current.scrollTop -
-              chatContainerRef.current.clientHeight
-          ) > 2 &&
-          attempts < 10
-        ) {
-          attempts++;
-          setTimeout(scroll, 50);
+      if (bottom) {
+        if (chatEndRef.current) {
+          chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+          if (
+            chatContainerRef.current &&
+            Math.abs(
+              chatContainerRef.current.scrollHeight -
+                chatContainerRef.current.scrollTop -
+                chatContainerRef.current.clientHeight
+            ) > 2 &&
+            attempts < 10
+          ) {
+            attempts++;
+            setTimeout(scroll, 50);
+          }
+        }
+      } else {
+        const element = document.getElementById(`${elementRefId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "instant" });
+          if (
+            chatContainerRef.current &&
+            Math.abs(
+              chatContainerRef.current.scrollHeight -
+                chatContainerRef.current.scrollTop -
+                chatContainerRef.current.clientHeight
+            ) > 2 &&
+            attempts < 10
+          ) {
+            attempts++;
+            setTimeout(scroll, 50);
+          }
         }
       }
     }
+
     scroll();
   };
 
@@ -441,31 +471,44 @@ export default function ChatPage({ params }: { params: { id: string } }) {
               onScroll={handleScroll}
               className="md:h-[500px] h-[350px] overflow-y-auto md:p-3 p-2 text-white custom-blur border-2 custom-border rounded-2xl no-scrollbar"
             >
-              {messages.map((messageObject: any, index: number) => (
-                <ChatMessage
-                  key={index}
-                  id={messageObject.id}
-                  sender={messageObject.userName}
-                  message={messageObject.message}
-                  isOwnMessage={messageObject.userName === userName}
-                  timestamp={messageObject.timestamp}
-                  onDelete={() => deleteMessage(messageObject.id)}
-                  onEdit={() => {
-                    setEditMessageID(messageObject.id);
-                    const imageUrl = extractImageUrl(messageObject.message);
-                    setEditImageUrl(imageUrl);
-                    setEditBaseText(
-                      removeImageUrlFromMessage(messageObject.message)
-                    );
-                  }}
-                  onRespond={() => setResponseToMessage(messageObject)}
-                  userName={userName}
-                  edited={messageObject.edited}
-                  response={messageObject.response}
-                />
-              ))}
-
+              <div style={{ opacity: elementRefId !== "" ? 0 : 1 }}>
+                {messages.map((messageObject: any, index: number) => (
+                  <ChatMessage
+                    key={index}
+                    id={messageObject.id}
+                    sender={messageObject.userName}
+                    message={messageObject.message}
+                    isOwnMessage={messageObject.userName === userName}
+                    timestamp={messageObject.timestamp}
+                    onDelete={() => deleteMessage(messageObject.id)}
+                    onEdit={() => {
+                      setEditMessageID(messageObject.id);
+                      const imageUrl = extractImageUrl(messageObject.message);
+                      setEditImageUrl(imageUrl);
+                      setEditBaseText(
+                        removeImageUrlFromMessage(messageObject.message)
+                      );
+                    }}
+                    onRespond={() => setResponseToMessage(messageObject)}
+                    userName={userName}
+                    edited={messageObject.edited}
+                    response={messageObject.response}
+                  />
+                ))}
+              </div>
               <div ref={chatEndRef} />
+            </div>
+
+            <div
+              style={{ opacity: elementRefId !== "" ? 1 : 0 }}
+              className="absolute w-full md:mt-[-30dvh] mt-[-23dvh]"
+            >
+              <div className="text-center">
+                <h1 className="text-lg font-semibold text-white">
+                  Connecting to database...
+                </h1>
+                <p className="text-sm text-white">Please wait</p>
+              </div>
             </div>
 
             <div className="text-sm text-white italic md:px-3 px-2 absolute mt-[-25px]">

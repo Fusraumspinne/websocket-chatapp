@@ -96,7 +96,7 @@ const ChatMessage = ({
 
   return (
     <div
-      className={`${isOwnMessage ? "md:ms-3 ms-2" : isSystemMessage ? "md:mx-3 mx-2" : "md:me-3 me-2"} cursor-pointer`}
+      id={id} className={`${isOwnMessage ? "md:ms-3 ms-2" : isSystemMessage ? "md:mx-3 mx-2" : "md:me-3 me-2"} cursor-pointer`}
     >
       <div
         className={`flex ${
