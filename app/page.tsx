@@ -6,16 +6,13 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
 
 // Bugs
+// Im admin dashboard kann ich naerichten zwar lsöcne aber nur über db nicht übdr socket
 // socket verbidnet sich manchmal nicht
 // Beim löschen wird auch das bild aus dropbox gelöscht
 
 // Features
 // Reaktionen auf Nachrichten
-// Links solllen klickbar sein 
-// Umbrüche in nachrichten bei links zumbeispiel
 // Verschlüsselung der Nachrichten
-
-// MongoDB
 
 // Socket.io
 // typing indikator kan vielleicht zu viele anfragen senden

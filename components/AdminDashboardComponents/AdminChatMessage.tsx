@@ -76,14 +76,37 @@ const AdminChatMessage = ({
     );
   }
 
+  function linkify(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.split(urlRegex).map((part, i) =>
+      urlRegex.test(part) ? (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline break-all text-blue-500"
+        >
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    );
+  }
+
   return (
-    <div className={`${isSystemMessage ? "md:mx-3 mx-2" : "md:me-3 me-2"} cursor-pointer`}>
+    <div
+      className={`${
+        isSystemMessage ? "md:mx-3 mx-2" : "md:me-3 me-2"
+      }`}
+    >
       <div
         className={`flex ${
           isSystemMessage ? "justify-center" : "justify-start"
         } md:mb-3 mb-2`}
       >
-        <div>
+        <div className="cursor-pointer">
           {(getResponseId() ||
             getResponseUsername() ||
             getResponseMessage()) && (
@@ -139,9 +162,7 @@ const AdminChatMessage = ({
                 <p className="md:text-xl text-base md:font-bold font-semibold">
                   {sender}
                 </p>
-                <p className="md:text-sm text-xs">
-                  {roomName}
-                </p>
+                <p className="md:text-sm text-xs">{roomName}</p>
               </div>
             )}
 
@@ -157,8 +178,8 @@ const AdminChatMessage = ({
               </div>
             )}
 
-            <p className="md:text-base text-xs md:font-normal font-medium">
-              {removeImageUrlFromMessage(message)}
+            <p className="md:text-base text-xs md:font-normal font-medium break-words overflow_wrap_anywhere">
+              {linkify(removeImageUrlFromMessage(message))}
             </p>
             <div className="flex">
               <p className="md:text-xs text-xs me-1">{timestamp}</p>

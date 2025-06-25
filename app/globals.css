@@ -37,3 +37,7 @@ body {
 .custom-border{
     border-color: rgba(275, 275, 275, 0.15);
 }
+
+.overflow_wrap_anywhere {
+  overflow-wrap: anywhere;
+}

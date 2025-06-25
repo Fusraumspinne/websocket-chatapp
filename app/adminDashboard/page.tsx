@@ -16,6 +16,7 @@ export default function AdminDashboard() {
 
   const [dbConnected, setDbConnected] = useState<boolean>(false);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const [messages, setMessages] = useState<any[]>([]);
 
@@ -38,6 +39,7 @@ export default function AdminDashboard() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   const chatEndRef = useRef<any>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const enterDashboard = () => {
     if (passwordInput === "2008") {
@@ -168,7 +170,6 @@ export default function AdminDashboard() {
     roomName: string
   ) => {
     socket.emit("editMessage", { message, roomName, id: messageId });
-
     try {
       const resEditMessage = await fetch("/api/editMessage", {
         method: "POST",
@@ -252,13 +253,52 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  });
-
-  const scrollToBottom = () => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (initialLoad) {
+      scrollToElement();
+      setTimeout(() => setInitialLoad(false), 500);
     }
+
+    if (!chatContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 200;
+
+    if (isAtBottom) {
+      scrollToElement();
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    scrollToElement();
+  }, [
+    loggedIn,
+    selectedRoom,
+    selectedUser,
+    allChatWindow,
+    usersWindow,
+    roomsWindow,
+  ]);
+
+  const scrollToElement = () => {
+    let attempts = 0;
+    function scroll() {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        if (
+          chatContainerRef.current &&
+          Math.abs(
+            chatContainerRef.current.scrollHeight -
+              chatContainerRef.current.scrollTop -
+              chatContainerRef.current.clientHeight
+          ) > 2 &&
+          attempts < 10
+        ) {
+          attempts++;
+          setTimeout(scroll, 50);
+        }
+      }
+    }
+
+    scroll();
   };
 
   function extractImageUrl(message: string): string {
@@ -362,7 +402,10 @@ export default function AdminDashboard() {
           <div>
             {allChatWindow && (
               <div className="border-2 custom-blur custom-border rounded-2xl md:mt-3 mt-2 md:p-3 p-2">
-                <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                <div
+                  ref={chatContainerRef}
+                  className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar"
+                >
                   {messages.map((messageObject: any, index: number) => (
                     <AdminChatMessage
                       key={index}
@@ -376,6 +419,7 @@ export default function AdminDashboard() {
                       onEdit={() => {
                         setEditMessageID(messageObject.id);
                         setEditMessageRoomName(messageObject.roomName);
+                        console.log(messageObject)
                         const imageUrl = extractImageUrl(messageObject.message);
                         setEditImageUrl(imageUrl);
                         setEditBaseText(
@@ -425,7 +469,9 @@ export default function AdminDashboard() {
                         <SearchIcon />
                       </button>
                     </div>
-                    <div className="md:mt-3 mt-2 flex flex-col md:h-[410px] h-[260px] overflow-y-auto p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                    <div
+                      className="md:mt-3 mt-2 flex flex-col md:h-[410px] h-[260px] overflow-y-auto p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar"
+                    >
                       {filteredRooms.length > 0 ? (
                         filteredRooms.map((room) => (
                           <div
@@ -445,7 +491,10 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div>
-                    <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                    <div
+                      ref={chatContainerRef}
+                      className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar"
+                    >
                       {messages
                         .filter((msg: any) => msg.roomName === selectedRoom)
                         .map((messageObject: any, index: number) => (
@@ -554,7 +603,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div>
-                    <div className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
+                    <div ref={chatContainerRef} className="md:h-[450px] h-[300px] overflow-y-auto md:p-3 p-2 text-white border-2 custom-blur custom-border rounded-2xl no-scrollbar">
                       {messages
                         .filter(
                           (messageObject: any) =>
