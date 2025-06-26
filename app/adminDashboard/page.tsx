@@ -419,7 +419,6 @@ export default function AdminDashboard() {
                       onEdit={() => {
                         setEditMessageID(messageObject.id);
                         setEditMessageRoomName(messageObject.roomName);
-                        console.log(messageObject)
                         const imageUrl = extractImageUrl(messageObject.message);
                         setEditImageUrl(imageUrl);
                         setEditBaseText(

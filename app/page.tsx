@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/lib/store";
 
 // Bugs
-// Im admin dashboard kann ich naerichten zwar lsöcne aber nur über db nicht übdr socket
-// socket verbidnet sich manchmal nicht
 // Beim löschen wird auch das bild aus dropbox gelöscht
 
 // Features
@@ -15,7 +13,6 @@ import { useUserStore } from "@/lib/store";
 // Verschlüsselung der Nachrichten
 
 // Socket.io
-// typing indikator kan vielleicht zu viele anfragen senden
 // anstatt bei socketio wenn man disconnected umgeleitet zuwerden versuchen den nutzer wieder zu reconnecten
 
 // Account

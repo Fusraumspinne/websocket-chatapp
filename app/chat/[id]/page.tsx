@@ -46,6 +46,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const userNameRef = useRef(userName);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [elementRefId, setElementRefId] = useState<string>("");
+  const lastTypingSentRef = useRef<number>(0);
   let typingTimeout: NodeJS.Timeout | null = null;
 
   useEffect(() => {
@@ -99,6 +100,12 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             );
             return sortedMessages;
           });
+          if(initialLoad){
+              setTimeout(() => {
+                setInitialLoad(false);
+                scrollToElement(true);
+              }, 100);
+          }
         }
       } catch (error) {
         console.error(
@@ -118,7 +125,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     scrollToElement(false);
-    setTimeout(() => setElementRefId(""), 500);
+    setTimeout(() => setElementRefId(""), 750);
   }, [elementRefId]);
 
   const handleSendMessage = (message: string) => {
@@ -307,9 +314,14 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   }, []);
 
   const handleTyping = () => {
+    const now = Date.now();
     if (!isTyping && editMessageID === "") {
       setIsTyping(true);
       socket.emit("typing", { userName, roomName });
+      lastTypingSentRef.current = now;
+    } else if (now - lastTypingSentRef.current > 1000) {
+      socket.emit("typing", { userName, roomName });
+      lastTypingSentRef.current = now;
     }
 
     if (typingTimeoutRef.current) {
@@ -338,11 +350,6 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   };
 
   useEffect(() => {
-    if (initialLoad) {
-      scrollToElement(true);
-      setTimeout(() => setInitialLoad(false), 500);
-    }
-
     if (!chatContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 200;
